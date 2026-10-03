@@ -957,21 +957,34 @@ function drawSwimmers(){
       // yanak pembeliği
       ctx.fillStyle = 'rgba(255,150,170,0.35)';
       ctx.beginPath(); ctx.arc(0.95*s, 0.3*s, 0.16*s, 0, Math.PI*2); ctx.fill();
-      // dış solungaçlar: her yanda üç tüylü dal
-      ctx.strokeStyle = GILL; ctx.lineCap = 'round';
+      // dış solungaçlar: başın iki yanından çıkıp yukarı ve aşağı açılan üçer uzun tüylü dal
+      ctx.lineCap = 'round';
+      const tips = [[-0.05, 1.35], [0.4, 1.45], [0.8, 1.25]];          // uç noktalar (x, |y|) s cinsinden
       for(const side of [-1, 1]){
         for(let i=0;i<3;i++){
-          const gx = 0.35*s - i*0.18*s, gy = side*(0.3*s + i*0.06*s);
-          const wg = Math.sin(time*3 + w.ph + i + side)*0.08*s;
-          const ex = gx - 0.35*s - i*0.08*s, ey = gy + side*(0.55*s + i*0.08*s) + wg;
-          ctx.lineWidth = 0.11*s;
-          ctx.beginPath(); ctx.moveTo(gx, gy); ctx.quadraticCurveTo(gx - 0.1*s, gy + side*0.3*s, ex, ey); ctx.stroke();
-          ctx.lineWidth = 0.05*s;
-          for(let b=1;b<=4;b++){ const t=b/5; const bx=gx+(ex-gx)*t, by=gy+(ey-gy)*t;
-            ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx - 0.14*s, by + side*0.1*s + wg*0.5); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + 0.06*s, by + side*0.16*s + wg*0.5); ctx.stroke(); }
+          const gx = 0.5*s, gy = side*0.38*s;                               // başın kenarı
+          const wg = Math.sin(time*2.5 + w.ph + i*0.8 + side)*0.08*s;
+          const ex = tips[i][0]*s + wg, ey = side*tips[i][1]*s;
+          const cx = gx + (ex-gx)*0.3 - 0.15*s, cy = gy + (ey-gy)*0.55;
+          // tüyler (ince dallar)
+          ctx.strokeStyle = '#ff9fbf'; ctx.lineWidth = 0.05*s;
+          for(let b=1;b<=7;b++){
+            const t=b/8;
+            const bx = (1-t)*(1-t)*gx + 2*(1-t)*t*cx + t*t*ex, by = (1-t)*(1-t)*gy + 2*(1-t)*t*cy + t*t*ey;
+            const fl = (0.28 - b*0.02)*s;
+            ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx - fl, by + side*fl*0.25 + wg*0.5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + fl*0.9, by + side*fl*0.35 + wg*0.5); ctx.stroke();
+          }
+          // sap
+          ctx.strokeStyle = GILL; ctx.lineWidth = 0.13*s;
+          ctx.beginPath(); ctx.moveTo(gx, gy); ctx.quadraticCurveTo(cx, cy, ex, ey); ctx.stroke();
         }
       }
+      // baş, solungaçların üstüne gelsin (gövdeden çıkıyor görünsün)
+      ctx.fillStyle = BODY;
+      ctx.beginPath(); ctx.ellipse(0.75*s, 0, 0.8*s, 0.52*s, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,150,170,0.35)';
+      ctx.beginPath(); ctx.arc(0.95*s, 0.3*s, 0.16*s, 0, Math.PI*2); ctx.fill();
       // gözler ve gülümseme
       for(const ey of [-0.2, 0.2]){
         ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(1.1*s, ey*s, 0.12*s, 0, Math.PI*2); ctx.fill();
