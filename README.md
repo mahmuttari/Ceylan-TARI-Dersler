@@ -20,7 +20,7 @@ Parmak basılıyken kanca balığa takılmaz; kanca balığın üstündeyken par
 bırakılınca balık takılır ve olta onu kendiliğinden su yüzeyine çeker. Balık
 yoksa kanca su üstüne geri çıkar.
 
-- Akvaryumda 20 balık yüzer (beta, japon balığı ve çatal kuyruklu türler); dipte salyangozlar, denizyıldızı ve midye, suda oltaya takılmayan deniz atları, karidesler, küçük turuncu bir ahtapot ve pembe solungaçlı beyaz bir aksolotl vardır; balık dışında hiçbir canlı oltaya takılmaz; hem **büyük N** hem **küçük n** balıkları doğrudur.
+- Akvaryumda 20 balık yüzer (beta, japon balığı ve çatal kuyruklu türler); dipte salyangozlar, denizyıldızı ve midye, suda oltaya takılmayan deniz atları, karidesler (biri büyük ve siyah), küçük turuncu bir ahtapot ve pembe solungaçlı beyaz bir aksolotl vardır; balık dışında hiçbir canlı oltaya takılmaz; hem **büyük N** hem **küçük n** balıkları doğrudur.
 - Balıklar ara sıra kendiliğinden hızlanır; kanca yaklaşınca bazen ürküp kaçar; takılan balık ara sıra yarı yolda kurtulur.
 - Doğru balık yakalanınca su sıçrama ve baloncuk sesi gelir, o harfin sayacı 1 artar.
 - Yanlış harfli balık (M, m, U, u, H, h, V, Z) yakalanırsa "yanlış" sesi gelir, büyük olan sayaçtan 1 düşer ve balık suya geri düşer. Ekranda yazılı uyarı çıkmaz.

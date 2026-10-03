@@ -460,8 +460,11 @@ function buildPlants(){
   const ks = Math.max(15, 20*S);
   for(let i=0;i<2;i++){
     swimmers.push({ type:'shrimp', x: rnd(60, W-60), y: sandTop - ks*0.9, vx: 0, dir: Math.random()<0.5?1:-1,
-      s: ks*rnd(0.9,1.15), ph: rnd(0,6), hop: 0, vy: 0, color: pick(['#ffb4a2','#ffc8a2','#ffa07a']) });
+      s: ks*rnd(0.9,1.15), ph: rnd(0,6), hop: 0, vy: 0, color: pick(['#ffb4a2','#ffc8a2','#ffa07a']), line: 'rgba(200,60,40,0.35)', ant: 'rgba(200,60,40,0.7)' });
   }
+  // büyük siyah karides (daha belirgin)
+  swimmers.push({ type:'shrimp', x: rnd(60, W-60), y: sandTop - ks*1.5*0.9, vx: 0, dir: Math.random()<0.5?1:-1,
+    s: ks*1.6, ph: rnd(0,6), hop: 0, vy: 0, color: '#15151e', line: 'rgba(255,255,255,0.3)', ant: 'rgba(40,40,60,0.95)' });
 }
 
 function renderStars(popLetter){
@@ -957,27 +960,26 @@ function drawSwimmers(){
       // yanak pembeliği
       ctx.fillStyle = 'rgba(255,150,170,0.35)';
       ctx.beginPath(); ctx.arc(0.95*s, 0.3*s, 0.16*s, 0, Math.PI*2); ctx.fill();
-      // dış solungaçlar: başın iki yanından çıkıp yukarı ve aşağı açılan üçer uzun tüylü dal
-      ctx.lineCap = 'round';
-      const tips = [[-0.05, 1.35], [0.4, 1.45], [0.8, 1.25]];          // uç noktalar (x, |y|) s cinsinden
+      // dış solungaçlar: başın iki yanından çıkan küçük tüylü dallar (kullanıcının beğendiği sürüm)
+      ctx.strokeStyle = GILL; ctx.lineCap = 'round';
       for(const side of [-1, 1]){
         for(let i=0;i<3;i++){
-          const gx = 0.5*s, gy = side*0.38*s;                               // başın kenarı
-          const wg = Math.sin(time*2.5 + w.ph + i*0.8 + side)*0.08*s;
-          const ex = tips[i][0]*s + wg, ey = side*tips[i][1]*s;
-          const cx = gx + (ex-gx)*0.3 - 0.15*s, cy = gy + (ey-gy)*0.55;
-          // tüyler (ince dallar)
-          ctx.strokeStyle = '#ff9fbf'; ctx.lineWidth = 0.05*s;
-          for(let b=1;b<=7;b++){
-            const t=b/8;
-            const bx = (1-t)*(1-t)*gx + 2*(1-t)*t*cx + t*t*ex, by = (1-t)*(1-t)*gy + 2*(1-t)*t*cy + t*t*ey;
-            const fl = (0.28 - b*0.02)*s;
-            ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx - fl, by + side*fl*0.25 + wg*0.5); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + fl*0.9, by + side*fl*0.35 + wg*0.5); ctx.stroke();
-          }
-          // sap
-          ctx.strokeStyle = GILL; ctx.lineWidth = 0.13*s;
+          const gx = 0.55*s - i*0.12*s, gy = side*0.42*s;
+          const ang = side * (-Math.PI/2) + (i-1)*0.42*side*-1 - 0.35*side*-1 + 0;
+          const len = 0.95*s - i*0.08*s;
+          const wg = Math.sin(time*3 + w.ph + i + side)*0.07*s;
+          const ex = gx + Math.cos(ang)*len*0.55 - 0.35*s - i*0.1*s, ey = gy + Math.sin(ang)*len + wg;
+          const cx = gx - 0.15*s, cy = gy + Math.sin(ang)*len*0.45;
+          ctx.lineWidth = 0.11*s;
           ctx.beginPath(); ctx.moveTo(gx, gy); ctx.quadraticCurveTo(cx, cy, ex, ey); ctx.stroke();
+          ctx.lineWidth = 0.045*s;
+          for(let b=1;b<=5;b++){
+            const t=b/6;
+            const bx = (1-t)*(1-t)*gx + 2*(1-t)*t*cx + t*t*ex, by = (1-t)*(1-t)*gy + 2*(1-t)*t*cy + t*t*ey;
+            const fl = (0.16 - b*0.015)*s;
+            ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx - fl, by + side*fl*0.3 + wg*0.4); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx + fl*0.8, by + side*fl*0.5 + wg*0.4); ctx.stroke();
+          }
         }
       }
       // baş, solungaçların üstüne gelsin (gövdeden çıkıyor görünsün)
@@ -1040,7 +1042,7 @@ function drawSwimmers(){
       ctx.fillStyle = w.color;
       for(const [x,y,r] of pts){ ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill(); }
       // bölüm çizgileri
-      ctx.strokeStyle = 'rgba(200,60,40,0.35)'; ctx.lineWidth = Math.max(1, 0.05*s);
+      ctx.strokeStyle = w.line; ctx.lineWidth = Math.max(1, 0.05*s);
       for(let i=2;i<14;i+=2){ const [x,y,r]=pts[i]; ctx.beginPath(); ctx.arc(x, y, r*0.95, 0, Math.PI*2); ctx.stroke(); }
       // kuyruk yelpazesi
       const [tx,ty] = pts[0];
@@ -1051,9 +1053,10 @@ function drawSwimmers(){
         ctx.beginPath(); ctx.moveTo(x, y+r*0.6); ctx.quadraticCurveTo(x+0.05*s, y+r+0.2*s, x+0.12*s+sw, y+r+0.45*s); ctx.stroke(); }
       // baş: göz, burun dikeni, antenler
       const [hx,hy,hr] = pts[16];
-      ctx.fillStyle = '#1a1a2e'; ctx.beginPath(); ctx.arc(hx+0.1*s, hy-0.15*s, 0.07*s, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(hx+0.1*s, hy-0.15*s, 0.09*s, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#1a1a2e'; ctx.beginPath(); ctx.arc(hx+0.12*s, hy-0.15*s, 0.055*s, 0, Math.PI*2); ctx.fill();
       ctx.fillStyle = w.color; ctx.beginPath(); ctx.moveTo(hx+0.1*s, hy-0.05*s); ctx.lineTo(hx+0.65*s, hy-0.3*s); ctx.lineTo(hx+0.15*s, hy+0.15*s); ctx.closePath(); ctx.fill();
-      ctx.strokeStyle = 'rgba(200,60,40,0.7)'; ctx.lineWidth = Math.max(1, 0.04*s);
+      ctx.strokeStyle = w.ant; ctx.lineWidth = Math.max(1, 0.04*s);
       const an = Math.sin(time*3 + w.ph)*0.15*s;
       ctx.beginPath(); ctx.moveTo(hx+0.2*s, hy-0.1*s); ctx.quadraticCurveTo(hx+0.9*s, hy-0.9*s+an, hx+0.3*s, hy-1.5*s+an); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(hx+0.2*s, hy-0.1*s); ctx.quadraticCurveTo(hx+1.2*s, hy-0.6*s-an, hx+1.0*s, hy-1.3*s-an); ctx.stroke();
