@@ -16,14 +16,15 @@ Ana sayfa (`index.html`) tüm dersleri listeler.
 
 Akvaryumda yüzen rengarenk balıkların üzerinde harfler vardır. Olta su üstünde
 bekler; öğrenci ekrana basılı tutarak (fare veya parmakla) kancayı suya indirir.
-Kanca balığa değince balık takılır ve olta onu kendiliğinden su yüzeyine çeker.
-Bırakınca kanca su üstüne geri çıkar.
+Parmak basılıyken kanca balığa takılmaz; kanca balığın üstündeyken parmak
+bırakılınca balık takılır ve olta onu kendiliğinden su yüzeyine çeker. Balık
+yoksa kanca su üstüne geri çıkar.
 
 - Akvaryumda 30 balık yüzer (beta, japon balığı ve çatal kuyruklu türler); dipte salyangozlar, denizyıldızı ve midye vardır; hem **büyük N** hem **küçük n** balıkları doğrudur.
 - Balıklar ara sıra kendiliğinden hızlanır; kanca yaklaşınca bazen ürküp kaçar; takılan balık ara sıra yarı yolda kurtulur.
 - Doğru balık yakalanınca su sıçrama ve baloncuk sesi gelir, sayaç 1 artar.
 - Yanlış harfli balık (M, m, U, u, H, h, V, Z) yakalanırsa "yanlış" sesi gelir, sayaç 1 azalır ve balık suya geri düşer. Ekranda yazılı uyarı çıkmaz.
-- Sayaç 30 olunca "Tebrikler" ekranı gösterilir.
+- Sayaç 30 olunca "Tebrikler" ekranı gösterilir ve ıslıklı alkış sesi çalar.
 - Sesler tarayıcı içinde üretilir; sağ alttaki 🔊 düğmesi ile kapatılabilir.
 - Tarayıcıda Türkçe ses varsa yönergeler ve yanlış uyarısı sesli de söylenir.
 

@@ -87,8 +87,8 @@
     <div class="biglet"><span>N</span> <span>n</span></div>
     <div class="fishrow">🐠🐟🐡🐠🐟</div>
     <p class="lead">Akvaryumdaki balıkların üzerinde harfler var.<br>
-      Oltayı tutup suya indir, kancayı <b>N ve n harfli</b> balığa değdir.<br>
-      Olta balığı kendiliğinden yukarı çeker!</p>
+      Oltayı tutup suya indir, kancayı <b>N ve n harfli</b> balığın<br>
+      üstüne getir ve <b>bırak</b>. Olta balığı yukarı çeker!</p>
     <button class="btn" id="startBtn">🎣 Oyuna Başla</button>
   </div>
 </div>
@@ -290,6 +290,48 @@ function winSound(){
   });
 }
 
+// Final: ıslıklarla karışık alkış
+function applauseSound(){
+  if(!ensureAudio()) return;
+  const t0 = actx.currentTime + 0.15, dur = 5.0;
+  // kısa beyaz gürültü (tek el çırpması)
+  const len = Math.floor(actx.sampleRate*0.08);
+  const clapBuf = actx.createBuffer(1, len, actx.sampleRate);
+  const d = clapBuf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/len, 2.5);
+  const claps = 170;
+  for(let i=0;i<claps;i++){
+    const t = t0 + Math.random()*dur;
+    const rel = (t - t0)/dur;
+    const env = Math.min(1, rel*4) * (rel > 0.8 ? (1-rel)/0.2 : 1);   // yavaş başlar, sonda söner
+    const src = actx.createBufferSource(); src.buffer = clapBuf;
+    src.playbackRate.value = rnd(0.8, 1.3);
+    const bp = actx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value = rnd(900, 3200); bp.Q.value = 0.8;
+    const g = actx.createGain(); g.gain.value = rnd(0.08, 0.2) * env;
+    src.connect(bp).connect(g).connect(master);
+    src.start(t); src.stop(t + 0.1);
+  }
+  // ıslıklar: yükselip inen sinüs, vibratolu
+  const whistle = (t) => {
+    const o = actx.createOscillator(); const g = actx.createGain();
+    const lfo = actx.createOscillator(); const lg = actx.createGain();
+    o.type = 'sine';
+    const f0 = rnd(1500, 1900);
+    o.frequency.setValueAtTime(f0, t);
+    o.frequency.exponentialRampToValueAtTime(f0*1.6, t+0.18);
+    o.frequency.exponentialRampToValueAtTime(f0*1.25, t+0.55);
+    lfo.frequency.value = 7; lg.gain.value = 45;
+    lfo.connect(lg).connect(o.frequency);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.14, t+0.05);
+    g.gain.setValueAtTime(0.14, t+0.4);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+0.6);
+    o.connect(g).connect(master);
+    o.start(t); lfo.start(t); o.stop(t+0.65); lfo.stop(t+0.65);
+  };
+  [0.5, 1.3, 2.2, 2.9, 3.8].forEach(dt => whistle(t0 + dt + rnd(-0.1, 0.1)));
+}
+
 // Arka plan: hafif su uğultusu + ara sıra baloncuk
 function startAmbient(){
   if(!ensureAudio() || ambientNodes) return;
@@ -460,7 +502,8 @@ function endGame(){
   hud.classList.add('hidden');
   winBox.classList.remove('hidden');
   winSound();
-  say('Tebrikler! Bütün N balıklarını yakaladın.');
+  applauseSound();
+  setTimeout(() => say('Tebrikler! Bütün N balıklarını yakaladın.'), 1500);
 }
 
 document.getElementById('startBtn').addEventListener('click', startGame);
@@ -483,7 +526,11 @@ canvas.addEventListener('pointerdown', e => {
 });
 function releasePointer(e){
   if(e && e.pointerId !== undefined){ try{ canvas.releasePointerCapture(e.pointerId); }catch(err){} }
-  hook.held = false;                // bırakıldı: kanca su üstüne geri çıkar
+  // parmak bırakıldığı anda kancanın altında balık varsa takılır
+  if(running && hook.held && hook.state === 'free' && hook.y > waterTop && catchCooldown <= 0){
+    if(!tryCatch()){ plopSound(); spawnBubbles(hook.x, hook.y, 3, 20*S); }
+  }
+  hook.held = false;                // bırakıldı: kanca su üstüne geri çıkar (ya da balığı çeker)
 }
 canvas.addEventListener('pointerup', releasePointer);
 canvas.addEventListener('pointercancel', releasePointer);
@@ -639,8 +686,6 @@ function update(dt){
             }
           }
         }
-        // kanca balığa değince balık takılır
-        if(catchCooldown <= 0) tryCatch();
       }
     }else{
       // tutulmuyor: kanca su üstünde bekler
