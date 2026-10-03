@@ -449,7 +449,11 @@ function buildPlants(){
       vx: (Math.random()<0.5?1:-1) * rnd(6, 11)*S, s: ss*rnd(0.9,1.1), ph: rnd(0,6),
       color: pick(['#ffb703','#ff8fab','#8ecae6','#ffd166','#c77dff']) });
   }
-  // siyah aksolotl (oltaya takılmaz)
+  // küçük mor ahtapot (oltaya takılmaz)
+  const os = Math.max(16, 24*S);
+  swimmers.push({ type:'octopus', x: rnd(W*0.15, W*0.85), baseY: rnd(waterTop + os*3, sandTop - os*4), y: 0,
+    vx: (Math.random()<0.5?1:-1) * rnd(10, 16)*S, s: os, ph: rnd(0,6) });
+  // tamamen siyah aksolotl (oltaya takılmaz)
   const ax = Math.max(32, 46*S);
   swimmers.push({ type:'axolotl', x: rnd(W*0.2, W*0.8), baseY: rnd(sandTop - ax*3.2, sandTop - ax*1.4), y: 0,
     vx: (Math.random()<0.5?1:-1) * rnd(12, 18)*S, s: ax, ph: rnd(0,6) });
@@ -720,7 +724,7 @@ function update(dt){
   // deniz atları süzülür, karidesler yürür ve ara sıra geriye sıçrar
   for(const w of swimmers){
     w.ph += dt;
-    if(w.type === 'seahorse' || w.type === 'axolotl'){
+    if(w.type === 'seahorse' || w.type === 'axolotl' || w.type === 'octopus'){
       w.x += w.vx*dt;
       w.y = w.baseY + Math.sin(time*0.9 + w.ph)*14*S;
       if(w.x > W - 60 && w.vx > 0) w.vx = -Math.abs(w.vx);
@@ -883,12 +887,44 @@ function drawSwimmers(){
   for(const w of swimmers){
     const s = w.s;
     ctx.save(); ctx.translate(w.x, w.y);
-    if(w.type === 'axolotl'){
+    if(w.type === 'octopus'){            // küçük mor ahtapot
+      // sekiz dalgalı kol
+      ctx.strokeStyle = '#6d3fc7'; ctx.lineCap = 'round';
+      for(let i=0;i<8;i++){
+        const a = (i/7 - 0.5) * 2.4;                  // yayılma açısı
+        const wv = Math.sin(time*2.2 + w.ph + i*0.9);
+        const x0 = Math.sin(a)*0.55*s, y0 = 0.35*s;
+        const cx1 = x0 + Math.sin(a)*0.5*s + wv*0.25*s, cy1 = y0 + 0.9*s;
+        const x2 = x0 + Math.sin(a)*1.1*s - wv*0.35*s,  y2 = y0 + 1.7*s + Math.cos(a)*0.2*s;
+        ctx.lineWidth = 0.26*s;
+        ctx.beginPath(); ctx.moveTo(x0, y0); ctx.quadraticCurveTo(cx1, cy1, (x0+x2)/2 + wv*0.1*s, (y0+y2)/2 + 0.2*s); ctx.stroke();
+        ctx.lineWidth = 0.13*s;
+        ctx.beginPath(); ctx.moveTo((x0+x2)/2 + wv*0.1*s, (y0+y2)/2 + 0.2*s); ctx.quadraticCurveTo(x2 + wv*0.2*s, y2 - 0.3*s, x2, y2); ctx.stroke();
+        // vantuzlar
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        for(let k=1;k<=3;k++){ const t=k/4; ctx.beginPath(); ctx.arc(x0 + (x2-x0)*t + wv*0.08*s, y0 + (y2-y0)*t + 0.1*s, 0.04*s, 0, Math.PI*2); ctx.fill(); }
+      }
+      // baş
+      const g = ctx.createRadialGradient(-0.3*s, -0.9*s, 0.1*s, 0, -0.5*s, 1.3*s);
+      g.addColorStop(0, '#b794ff'); g.addColorStop(1, '#6d3fc7');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.ellipse(0, -0.45*s, 1.0*s, 1.15*s, 0, 0, Math.PI*2); ctx.fill();
+      // gözler
+      for(const ex of [-0.38, 0.38]){
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ex*s, -0.35*s, 0.26*s, 0, Math.PI*2); ctx.fill();
+        const look = Math.sin(time*1.3 + w.ph)*0.06*s;
+        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(ex*s + look, -0.33*s, 0.13*s, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ex*s + look + 0.05*s, -0.4*s, 0.05*s, 0, Math.PI*2); ctx.fill();
+      }
+      // gülümseme
+      ctx.strokeStyle = 'rgba(40,10,80,0.7)'; ctx.lineWidth = Math.max(1.5, 0.06*s);
+      ctx.beginPath(); ctx.arc(0, 0.05*s, 0.22*s, 0.2, Math.PI - 0.2); ctx.stroke();
+    }else if(w.type === 'axolotl'){
       ctx.scale(w.vx >= 0 ? 1 : -1, 1);
-      const BODY = '#1c1c2b', GILL = '#e63965';
+      const BODY = '#111118', GILL = '#111118';
       const wave = (x) => Math.sin(time*5 + w.ph - x*1.4/s) * 0.12*s * Math.max(0, (0.2*s - x)/(2.6*s));
       // kuyruk yüzgeci (dalgalanır)
-      ctx.fillStyle = 'rgba(60,60,85,0.8)';
+      ctx.fillStyle = 'rgba(17,17,24,0.85)';
       ctx.beginPath(); ctx.moveTo(-0.2*s, -0.3*s);
       for(let x=-0.2*s; x>=-2.5*s; x-=0.15*s){ const t=(-0.2*s-x)/(2.3*s); ctx.lineTo(x, wave(x) - 0.3*s - 0.3*s*Math.sin(t*Math.PI)); }
       ctx.lineTo(-2.6*s, wave(-2.6*s));
