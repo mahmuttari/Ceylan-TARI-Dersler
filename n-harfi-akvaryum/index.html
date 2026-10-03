@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>N Harfi Akvaryumu</title>
+<style>
+  :root{
+    --ink:#0b3b5c;
+    --sun:#ffd166;
+    --coral:#ff6b6b;
+    --sea:#1b9bd8;
+    --foam:#eaf9ff;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;overflow:hidden;background:#0a4f8a;
+    font-family:"Comic Sans MS","Chalkboard SE","Arial Rounded MT Bold","Segoe UI",Arial,sans-serif;
+    color:var(--ink);user-select:none;-webkit-user-select:none;touch-action:none}
+  canvas#game{position:fixed;inset:0;display:block;cursor:none}
+
+  /* ---------- overlays ---------- */
+  .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    background:rgba(8,58,94,.38);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+    z-index:10;padding:16px;text-align:center}
+  .overlay.hidden{display:none}
+  .card{background:rgba(255,255,255,.92);border-radius:28px;padding:28px 28px 32px;max-width:640px;width:100%;
+    box-shadow:0 20px 60px rgba(0,40,80,.35),inset 0 0 0 6px #fff}
+  .teacher{font-size:clamp(18px,3.4vw,26px);font-weight:700;letter-spacing:.5px;color:#0b5c8f;
+    background:#e6f6ff;border-radius:999px;padding:10px 22px;display:inline-block;margin-bottom:18px}
+  .teacher small{display:block;font-size:.72em;font-weight:600;color:#2a7fb3;margin-top:2px}
+  h1{margin:6px 0 4px;font-size:clamp(30px,6vw,52px);line-height:1.05;color:#083a5e}
+  .biglet{font-size:clamp(90px,20vw,160px);line-height:1;font-weight:900;margin:8px 0 6px}
+  .biglet span{display:inline-block;animation:bob 2.2s ease-in-out infinite;color:#ff3d7f;
+    text-shadow:0 6px 0 #b4175a,0 10px 24px rgba(0,0,0,.2)}
+  .biglet span:nth-child(2){animation-delay:.5s;color:#2b7de9;text-shadow:0 6px 0 #1a4f9c,0 10px 24px rgba(0,0,0,.2)}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}}
+  p.lead{font-size:clamp(16px,2.6vw,21px);margin:6px 0 20px;color:#1a4f73}
+  .btn{font:inherit;font-size:clamp(20px,3.6vw,30px);font-weight:800;color:#fff;border:0;cursor:pointer;
+    background:linear-gradient(180deg,#ff9f43,#ff6b35);border-radius:999px;padding:16px 42px;
+    box-shadow:0 8px 0 #c74d1f,0 14px 30px rgba(0,0,0,.25);transition:transform .08s,box-shadow .08s}
+  .btn:active{transform:translateY(6px);box-shadow:0 2px 0 #c74d1f,0 6px 14px rgba(0,0,0,.25)}
+  .btn.alt{background:linear-gradient(180deg,#4fd1c5,#1fa2b8);box-shadow:0 8px 0 #137488,0 14px 30px rgba(0,0,0,.25)}
+  .btn.alt:active{box-shadow:0 2px 0 #137488,0 6px 14px rgba(0,0,0,.25)}
+  .fishrow{font-size:clamp(28px,6vw,46px);margin:4px 0 10px;letter-spacing:6px}
+
+  /* ---------- HUD ---------- */
+  #hud{position:fixed;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;
+    padding:10px 12px;pointer-events:none;z-index:5}
+  #hud.hidden{display:none}
+  .pill{background:rgba(255,255,255,.88);border-radius:18px;padding:8px 14px;box-shadow:0 6px 18px rgba(0,30,60,.25);
+    font-weight:800;font-size:clamp(15px,2.4vw,20px);color:#0b3b5c;display:flex;align-items:center;gap:10px;white-space:nowrap}
+  .pill .tl{font-size:clamp(34px,6vw,56px);line-height:1;font-weight:900;color:#ff3d7f;
+    text-shadow:0 3px 0 rgba(0,0,0,.12);min-width:1.1em;text-align:center}
+  .pill .tl.small{color:#2b7de9}
+  .stars{display:flex;gap:3px;flex-wrap:wrap;max-width:34vw;justify-content:flex-end}
+  .stars i{display:inline-block;width:clamp(14px,2.4vw,22px);height:clamp(14px,2.4vw,22px);border-radius:50%;
+    background:#dbe9f3;border:2px solid #b7d0e2}
+  .stars i.on{background:var(--sun);border-color:#f4a21a;box-shadow:0 0 10px #ffd166}
+  #msg{position:fixed;left:50%;top:18%;transform:translate(-50%,-50%) scale(.6);opacity:0;z-index:6;pointer-events:none;
+    font-size:clamp(26px,5.5vw,54px);font-weight:900;color:#fff;text-align:center;padding:10px 28px;border-radius:24px;
+    text-shadow:0 3px 0 rgba(0,0,0,.25),0 0 18px rgba(0,0,0,.25);transition:opacity .25s,transform .25s}
+  #msg.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  #msg.good{background:rgba(46,204,113,.85)}
+  #msg.bad{background:rgba(255,107,107,.88)}
+  #sound{position:fixed;right:12px;bottom:12px;z-index:7;background:rgba(255,255,255,.9);border:0;border-radius:50%;
+    width:52px;height:52px;font-size:26px;cursor:pointer;box-shadow:0 6px 18px rgba(0,30,60,.3)}
+  #sound.hidden{display:none}
+  .words{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:6px 0 18px}
+  .words span{background:#fff3cd;border:3px solid #ffd166;border-radius:14px;padding:6px 14px;font-weight:800;
+    font-size:clamp(16px,3vw,22px);color:#7a4b00}
+  .words b{color:#ff3d7f}
+</style>
+</head>
+<body>
+
+<!-- ---------- GİRİŞ EKRANI ---------- -->
+<div id="intro" class="overlay">
+  <div class="card">
+    <div class="teacher">Ceylan Tarı<small>Birinci Sınıf Öğretmeni</small></div>
+    <h1>N Harfi Akvaryumu</h1>
+    <div class="biglet"><span>N</span> <span>n</span></div>
+    <div class="fishrow">🐠🐟🐡🐠🐟</div>
+    <p class="lead">Akvaryumdaki balıkların üzerinde harfler var.<br>
+      Oltanla <b>sadece N ve n harfli</b> balıkları yakala!</p>
+    <button class="btn" id="startBtn">🎣 Oyuna Başla</button>
+  </div>
+</div>
+
+<!-- ---------- KAZANMA EKRANI ---------- -->
+<div id="win" class="overlay hidden">
+  <div class="card">
+    <div class="teacher">Ceylan Tarı<small>Birinci Sınıf Öğretmeni</small></div>
+    <h1>🎉 Tebrikler! 🎉</h1>
+    <div class="biglet"><span>N</span> <span>n</span></div>
+    <p class="lead">Bütün N ve n balıklarını yakaladın!<br>N harfiyle başlayan kelimeler:</p>
+    <div class="words">
+      <span><b>N</b>ar</span><span><b>N</b>ane</span><span><b>N</b>ine</span>
+      <span><b>N</b>ehir</span><span><b>N</b>ohut</span><span><b>N</b>al</span>
+    </div>
+    <button class="btn alt" id="againBtn">🔁 Tekrar Oyna</button>
+  </div>
+</div>
+
+<canvas id="game"></canvas>
+
+<div id="hud" class="hidden">
+  <div class="pill">Yakala: <span class="tl" id="targetLetter">N</span><span id="targetName">Büyük N</span></div>
+  <div class="pill"><span>⭐</span><div class="stars" id="stars"></div></div>
+</div>
+<div id="msg"></div>
+<button id="sound" class="hidden" title="Ses aç/kapat">🔊</button>
+
+<script>
+(() => {
+"use strict";
+
+/* =========================================================
+   AYARLAR
+   ========================================================= */
+const GOAL = 10;                       // kazanmak için gereken doğru yakalama
+const FISH_COUNT = 11;
+const DISTRACTORS = ['M','m','U','u','H','h','V','Z'];
+const PALETTES = [
+  ['#ff6b6b','#ffd166'], ['#ffa94d','#ff6b6b'], ['#ffd43b','#ff922b'],
+  ['#51cf66','#2b8a3e'], ['#4dabf7','#1864ab'], ['#9775fa','#5f3dc4'],
+  ['#f783ac','#c2255c'], ['#20c997','#087f5b'], ['#ff8787','#ffe066'],
+  ['#74c0fc','#f783ac'], ['#a9e34b','#2f9e44'], ['#ffa8a8','#7048e8']
+];
+const LETTER_FONT = '"Comic Sans MS","Chalkboard SE","Arial Rounded MT Bold",Arial,sans-serif';
+
+/* =========================================================
+   DOM
+   ========================================================= */
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const intro = document.getElementById('intro');
+const winBox = document.getElementById('win');
+const hud = document.getElementById('hud');
+const msgEl = document.getElementById('msg');
+const soundBtn = document.getElementById('sound');
+const targetLetterEl = document.getElementById('targetLetter');
+const targetNameEl = document.getElementById('targetName');
+const starsEl = document.getElementById('stars');
+
+/* =========================================================
+   SES (Web Audio ile üretilen su / baloncuk sesleri)
+   ========================================================= */
+let actx = null, master = null, ambientNodes = null, soundOn = true;
+
+function ensureAudio(){
+  if(!actx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return false;
+    actx = new AC();
+    master = actx.createGain();
+    master.gain.value = soundOn ? 1 : 0;
+    master.connect(actx.destination);
+  }
+  if(actx.state === 'suspended') actx.resume();
+  return true;
+}
+
+function noiseBuffer(seconds){
+  const len = Math.floor(actx.sampleRate * seconds);
+  const buf = actx.createBuffer(1, len, actx.sampleRate);
+  const d = buf.getChannelData(0);
+  let last = 0;
+  for(let i=0;i<len;i++){            // kahverengiye yakın yumuşak gürültü
+    const w = Math.random()*2-1;
+    last = (last + 0.02*w) / 1.02;
+    d[i] = last * 3.5;
+  }
+  return buf;
+}
+
+// Tek bir baloncuk "blup" sesi: yükselen sinüs
+function bubbleSound(delay=0, pitch=500, vol=0.25, len=0.14){
+  if(!actx) return;
+  const t = actx.currentTime + delay;
+  const o = actx.createOscillator();
+  const g = actx.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(pitch, t);
+  o.frequency.exponentialRampToValueAtTime(pitch*2.6, t+len*0.8);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t+len);
+  o.connect(g).connect(master);
+  o.start(t); o.stop(t+len+0.02);
+}
+
+// Su sıçrama sesi: bant geçiren filtreden geçen gürültü
+function splashSound(delay=0, vol=0.5, dur=0.55){
+  if(!actx) return;
+  const t = actx.currentTime + delay;
+  const src = actx.createBufferSource();
+  src.buffer = noiseBuffer(dur+0.1);
+  const bp = actx.createBiquadFilter();
+  bp.type = 'bandpass'; bp.Q.value = 0.9;
+  bp.frequency.setValueAtTime(1800, t);
+  bp.frequency.exponentialRampToValueAtTime(350, t+dur);
+  const g = actx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+  src.connect(bp).connect(g).connect(master);
+  src.start(t); src.stop(t+dur+0.1);
+}
+
+// Doğru balık: sıçrama + köpüren baloncuklar + küçük çan
+function catchSound(){
+  if(!ensureAudio()) return;
+  splashSound(0, 0.55, 0.6);
+  for(let i=0;i<7;i++){
+    bubbleSound(0.05 + i*0.07 + Math.random()*0.03, 380 + i*110 + Math.random()*80, 0.22, 0.13);
+  }
+  const notes = [523.25, 659.25, 783.99];
+  notes.forEach((f,i)=>{
+    const t = actx.currentTime + 0.25 + i*0.09;
+    const o = actx.createOscillator(); const g = actx.createGain();
+    o.type='triangle'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(0.18,t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.35);
+    o.connect(g).connect(master); o.start(t); o.stop(t+0.4);
+  });
+}
+
+// Yanlış balık: küçük sıçrama + düşen ton
+function wrongSound(){
+  if(!ensureAudio()) return;
+  splashSound(0, 0.25, 0.3);
+  const t = actx.currentTime;
+  const o = actx.createOscillator(); const g = actx.createGain();
+  o.type='triangle';
+  o.frequency.setValueAtTime(240,t);
+  o.frequency.exponentialRampToValueAtTime(150,t+0.35);
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(0.2,t+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+0.4);
+  o.connect(g).connect(master); o.start(t); o.stop(t+0.45);
+}
+
+// Boş suya tıklama: küçük "plop"
+function plopSound(){
+  if(!ensureAudio()) return;
+  bubbleSound(0, 300, 0.18, 0.12);
+  splashSound(0, 0.12, 0.2);
+}
+
+function winSound(){
+  if(!ensureAudio()) return;
+  splashSound(0,0.5,0.8);
+  const notes=[523.25,659.25,783.99,1046.5,783.99,1046.5,1318.5];
+  notes.forEach((f,i)=>{
+    const t=actx.currentTime+0.1+i*0.13;
+    const o=actx.createOscillator(); const g=actx.createGain();
+    o.type='triangle'; o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(0.2,t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.45);
+    o.connect(g).connect(master); o.start(t); o.stop(t+0.5);
+    bubbleSound(0.1+i*0.13, 500+i*90, 0.12, 0.12);
+  });
+}
+
+// Arka plan: hafif su uğultusu + ara sıra baloncuk
+function startAmbient(){
+  if(!ensureAudio() || ambientNodes) return;
+  const src = actx.createBufferSource();
+  src.buffer = noiseBuffer(3); src.loop = true;
+  const lp = actx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value = 420;
+  const g = actx.createGain(); g.gain.value = 0.045;
+  src.connect(lp).connect(g).connect(master); src.start();
+  ambientNodes = {src, g};
+}
+let nextAmbientBubble = 0;
+
+function setSound(on){
+  soundOn = on;
+  soundBtn.textContent = on ? '🔊' : '🔇';
+  if(master) master.gain.setTargetAtTime(on?1:0, actx.currentTime, 0.05);
+  if(!on && 'speechSynthesis' in window) speechSynthesis.cancel();
+}
+soundBtn.addEventListener('click', e => { e.stopPropagation(); ensureAudio(); setSound(!soundOn); });
+
+// Türkçe seslendirme (varsa)
+function say(text){
+  if(!soundOn || !('speechSynthesis' in window)) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'tr-TR'; u.rate = 0.9; u.pitch = 1.1;
+    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith('tr'));
+    if(v) u.voice = v;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* =========================================================
+   TUVAL / BOYUT
+   ========================================================= */
+let W=0, H=0, dpr=1, waterTop=0, sandTop=0, S=1;
+function resize(){
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = Math.round(W*dpr); canvas.height = Math.round(H*dpr);
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  waterTop = Math.round(H*0.17);
+  sandTop  = H - Math.round(H*0.10);
+  S = Math.min(W,H)/700;            // ölçek katsayısı
+  buildPlants();
+}
+window.addEventListener('resize', resize);
+
+/* =========================================================
+   OYUN DURUMU
+   ========================================================= */
+const rnd = (a,b) => a + Math.random()*(b-a);
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+
+let fishes = [], bubbles = [], drops = [], plants = [], pebbles = [];
+let score = 0, target = 'N', running = false, time = 0, lastTs = 0;
+const pointer = { x: W/2, y: H/2, inside:false };
+const hook = { x: 0, y: 0, state: 'free', fish: null };  // free | reeling | returning
+let msgTimer = 0;
+
+function fishRadius(){ return Math.max(26, 40*S); }
+
+function makeFish(letter, fromEdge){
+  const r = fishRadius() * rnd(0.85, 1.2);
+  const [c1,c2] = pick(PALETTES);
+  const minY = waterTop + r*1.4, maxY = sandTop - r*1.3;
+  const dir = Math.random()<0.5 ? 1 : -1;
+  const f = {
+    letter, r, color: c1, color2: c2,
+    baseY: rnd(minY, maxY), amp: rnd(6, 18)*S, wf: rnd(0.8,1.6), ph: rnd(0,Math.PI*2),
+    vx: dir * rnd(35, 75) * S,
+    x: fromEdge ? (dir>0 ? -r*2 : W + r*2) : rnd(r, W-r),
+    y: 0, hooked:false, falling:false, tailPh: rnd(0,Math.PI*2), stripes: Math.random()<0.5
+  };
+  f.y = f.baseY;
+  return f;
+}
+
+function initFishes(){
+  fishes = [];
+  const letters = ['N','N','N','n','n','n'];
+  while(letters.length < FISH_COUNT) letters.push(pick(DISTRACTORS));
+  letters.sort(()=>Math.random()-0.5);
+  letters.forEach(l => fishes.push(makeFish(l, false)));
+}
+
+function buildPlants(){
+  plants = []; pebbles = [];
+  const n = Math.max(5, Math.round(W/140));
+  for(let i=0;i<n;i++){
+    plants.push({ x: (i+0.5)*(W/n) + rnd(-30,30), h: rnd(H*0.12, H*0.26), w: rnd(14,26)*S,
+      ph: rnd(0,Math.PI*2), color: pick(['#2f9e44','#37b24d','#20c997','#5c940d','#12b886']) });
+  }
+  for(let i=0;i<Math.round(W/60);i++){
+    pebbles.push({ x: rnd(0,W), y: rnd(sandTop+8, H-6), r: rnd(4,11)*S, c: pick(['#c9a97a','#b08d5b','#e0c38e','#9e7b4f']) });
+  }
+}
+
+function setTarget(t, announce=true){
+  target = t;
+  const isBig = t === 'N';
+  targetLetterEl.textContent = t;
+  targetLetterEl.classList.toggle('small', !isBig);
+  targetNameEl.textContent = isBig ? 'Büyük N' : 'Küçük n';
+  if(announce) say(isBig ? 'Büyük N balıklarını yakala' : 'Küçük n balıklarını yakala');
+}
+
+function renderStars(){
+  starsEl.innerHTML = '';
+  for(let i=0;i<GOAL;i++){
+    const s = document.createElement('i');
+    if(i<score) s.className='on';
+    starsEl.appendChild(s);
+  }
+}
+
+function showMsg(text, kind){
+  msgEl.textContent = text;
+  msgEl.className = 'show ' + kind;
+  msgTimer = 1.6;
+}
+
+function letterName(l){
+  const upper = l === l.toUpperCase();
+  return (upper ? 'büyük ' : 'küçük ') + l;
+}
+
+/* =========================================================
+   OYUN AKIŞI
+   ========================================================= */
+function startGame(){
+  ensureAudio(); startAmbient();
+  score = 0; renderStars();
+  initFishes(); bubbles = []; drops = [];
+  hook.state = 'free'; hook.fish = null;
+  hook.x = W/2; hook.y = H*0.5;
+  pointer.x = W/2; pointer.y = H*0.5;
+  intro.classList.add('hidden'); winBox.classList.add('hidden');
+  hud.classList.remove('hidden'); soundBtn.classList.remove('hidden');
+  running = true;
+  setTarget(Math.random()<0.5?'N':'n');
+}
+
+function endGame(){
+  running = false;
+  hud.classList.add('hidden');
+  winBox.classList.remove('hidden');
+  winSound();
+  say('Tebrikler! Bütün N balıklarını yakaladın.');
+}
+
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('againBtn').addEventListener('click', startGame);
+
+/* ---------- işaretçi ---------- */
+function updatePointer(e){
+  const rect = canvas.getBoundingClientRect();
+  pointer.x = e.clientX - rect.left; pointer.y = e.clientY - rect.top; pointer.inside = true;
+}
+canvas.addEventListener('pointermove', updatePointer);
+canvas.addEventListener('pointerleave', () => pointer.inside = false);
+canvas.addEventListener('pointerdown', e => {
+  if(!running) return;
+  updatePointer(e);
+  ensureAudio();
+  if(hook.state !== 'free') return;
+  // dokunmatikte kanca anında parmağın altına gelsin
+  hook.x = pointer.x; hook.y = pointer.y;
+  tryCatch();
+});
+
+function tryCatch(){
+  let best = null, bestD = Infinity;
+  for(const f of fishes){
+    if(f.hooked) continue;
+    const d = Math.hypot(f.x - hook.x, f.y - hook.y);
+    if(d < f.r*1.25 + 14*S && d < bestD){ best = f; bestD = d; }
+  }
+  if(best){
+    best.hooked = true; best.falling = false;
+    hook.fish = best; hook.state = 'reeling';
+    bubbleSound(0, 420, 0.2, 0.12);
+    spawnBubbles(best.x, best.y, 6, best.r);
+  }else{
+    if(hook.y > waterTop){
+      plopSound();
+      spawnBubbles(hook.x, hook.y, 3, 20*S);
+    }
+  }
+}
+
+function resolveCatch(){
+  const f = hook.fish;
+  hook.fish = null; hook.state = 'returning';
+  if(!f) return;
+  spawnDrops(f.x, waterTop, 26);
+  if(f.letter === target){
+    score++; renderStars();
+    catchSound();
+    showMsg('Aferin! ' + (target==='N' ? 'Büyük N' : 'Küçük n') + ' 🎉', 'good');
+    spawnBubbles(f.x, waterTop + 20, 18, 60*S);
+    // balığı kaldır, aynı türden yeni balık getir
+    fishes.splice(fishes.indexOf(f), 1);
+    fishes.push(makeFish(f.letter, true));
+    if(score >= GOAL){ setTimeout(endGame, 900); return; }
+    // hedefi değiştir (çoğunlukla diğer harfe geç)
+    const next = Math.random() < 0.65 ? (target==='N'?'n':'N') : target;
+    setTimeout(() => { if(running){ setTarget(next); } }, 1100);
+  }else{
+    wrongSound();
+    const isN = f.letter.toLowerCase() === 'n';
+    showMsg(isN ? ('Bu ' + letterName(f.letter) + '! ' + (target==='N'?'Büyük N':'Küçük n') + ' lazım')
+                : ('Bu ' + f.letter + ' harfi, N değil!'), 'bad');
+    // balık suya geri düşer
+    f.hooked = false; f.falling = true;
+    f.baseY = rnd(waterTop + f.r*1.6, sandTop - f.r*1.4);
+    f.y = waterTop + f.r*0.6;
+  }
+}
+
+/* ---------- parçacıklar ---------- */
+function spawnBubbles(x, y, n, spread){
+  for(let i=0;i<n;i++){
+    bubbles.push({ x: x + rnd(-spread,spread)*0.6, y: y + rnd(-spread,spread)*0.4,
+      r: rnd(3,9)*S, vy: rnd(40,110)*S, wob: rnd(0,Math.PI*2), life: 1, ambient:false });
+  }
+}
+function spawnDrops(x, y, n){
+  for(let i=0;i<n;i++){
+    const a = rnd(-Math.PI*0.85, -Math.PI*0.15);
+    const sp = rnd(120, 320)*S;
+    drops.push({ x: x + rnd(-20,20)*S, y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, r: rnd(2.5,6)*S, life: 1 });
+  }
+}
+
+/* =========================================================
+   GÜNCELLEME
+   ========================================================= */
+function update(dt){
+  time += dt;
+
+  // ortam baloncukları
+  if(time > nextAmbientBubble){
+    nextAmbientBubble = time + rnd(0.5, 1.6);
+    const px = rnd(20, W-20);
+    bubbles.push({ x: px, y: sandTop - 4, r: rnd(3,8)*S, vy: rnd(35,70)*S, wob: rnd(0,Math.PI*2), life: 1, ambient:true });
+    if(running && Math.random() < 0.35) bubbleSound(0, rnd(250,450), 0.05, 0.12);
+  }
+
+  // balıklar
+  for(const f of fishes){
+    f.tailPh += dt * 9;
+    if(f.hooked){
+      f.x = hook.x; f.y = hook.y + f.r*0.55;
+      continue;
+    }
+    if(f.falling){
+      f.y += 220*S*dt;
+      if(f.y >= f.baseY){ f.y = f.baseY; f.falling = false; }
+    }else{
+      f.y = f.baseY + Math.sin(time*f.wf + f.ph)*f.amp;
+    }
+    f.x += f.vx*dt;
+    if(f.x > W - f.r*0.5 && f.vx > 0){ f.vx = -Math.abs(f.vx); }
+    if(f.x < f.r*0.5 && f.vx < 0){ f.vx = Math.abs(f.vx); }
+    if(Math.random() < 0.004) f.vx = Math.sign(f.vx) * rnd(35,80)*S;
+  }
+
+  // kanca
+  if(hook.state === 'free'){
+    const tx = pointer.x, ty = Math.max(waterTop - 40, pointer.y);
+    hook.x += (tx - hook.x) * Math.min(1, dt*12);
+    hook.y += (ty - hook.y) * Math.min(1, dt*12);
+  }else if(hook.state === 'reeling'){
+    hook.y -= 480*S*dt;
+    if(hook.fish && Math.random() < 0.5) spawnBubbles(hook.x, hook.y + hook.fish.r, 1, hook.fish.r*0.6);
+    if(hook.y <= waterTop - 10*S) resolveCatch();
+  }else if(hook.state === 'returning'){
+    const ty = Math.max(waterTop - 40, pointer.y);
+    hook.x += (pointer.x - hook.x) * Math.min(1, dt*6);
+    hook.y += (ty - hook.y) * Math.min(1, dt*6);
+    if(Math.abs(ty - hook.y) < 12) hook.state = 'free';
+  }
+  hook.x = Math.max(10, Math.min(W-10, hook.x));
+  hook.y = Math.max(waterTop - 60, Math.min(H - 10, hook.y));
+
+  // baloncuklar
+  for(let i=bubbles.length-1;i>=0;i--){
+    const b = bubbles[i];
+    b.y -= b.vy*dt; b.wob += dt*3; b.x += Math.sin(b.wob)*18*S*dt;
+    if(b.y < waterTop + 4){ bubbles.splice(i,1); if(Math.random()<0.25) spawnDropsSmall(b.x); }
+  }
+  // damlalar
+  for(let i=drops.length-1;i>=0;i--){
+    const d = drops[i];
+    d.vy += 900*S*dt; d.x += d.vx*dt; d.y += d.vy*dt; d.life -= dt*1.3;
+    if(d.life <= 0 || d.y > waterTop + 10) drops.splice(i,1);
+  }
+
+  if(msgTimer > 0){ msgTimer -= dt; if(msgTimer <= 0) msgEl.className = ''; }
+}
+function spawnDropsSmall(x){
+  drops.push({ x, y: waterTop, vx: rnd(-30,30)*S, vy: -rnd(60,140)*S, r: rnd(1.5,3)*S, life: 0.6 });
+}
+
+/* =========================================================
+   ÇİZİM
+   ========================================================= */
+function drawBackground(){
+  // gökyüzü / akvaryum üstü
+  let g = ctx.createLinearGradient(0,0,0,waterTop);
+  g.addColorStop(0,'#eaf9ff'); g.addColorStop(1,'#bfe9ff');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,waterTop);
+
+  // su
+  g = ctx.createLinearGradient(0,waterTop,0,H);
+  g.addColorStop(0,'#5fd0f7'); g.addColorStop(0.5,'#1f98d6'); g.addColorStop(1,'#0b4f86');
+  ctx.fillStyle = g; ctx.fillRect(0,waterTop,W,H-waterTop);
+
+  // ışık huzmeleri
+  ctx.save(); ctx.globalAlpha = 0.10; ctx.fillStyle = '#ffffff';
+  for(let i=0;i<5;i++){
+    const bx = W*(0.1+i*0.2) + Math.sin(time*0.4+i)*30;
+    ctx.beginPath();
+    ctx.moveTo(bx-30*S, waterTop); ctx.lineTo(bx+40*S, waterTop);
+    ctx.lineTo(bx+170*S, sandTop); ctx.lineTo(bx-10*S, sandTop); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+
+  // kum
+  g = ctx.createLinearGradient(0,sandTop,0,H);
+  g.addColorStop(0,'#f2d9a2'); g.addColorStop(1,'#c9a470');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.moveTo(0,H); ctx.lineTo(0,sandTop+8);
+  for(let x=0;x<=W;x+=40){ ctx.quadraticCurveTo(x+20, sandTop + (x/40%2?14:0), x+40, sandTop+8); }
+  ctx.lineTo(W,H); ctx.closePath(); ctx.fill();
+  for(const p of pebbles){ ctx.fillStyle = p.c; ctx.beginPath(); ctx.ellipse(p.x,p.y,p.r,p.r*0.7,0,0,Math.PI*2); ctx.fill(); }
+}
+
+function drawPlants(){
+  for(const p of plants){
+    ctx.strokeStyle = p.color; ctx.lineCap = 'round'; ctx.lineWidth = p.w;
+    ctx.beginPath(); ctx.moveTo(p.x, sandTop+10);
+    const segs = 6;
+    for(let i=1;i<=segs;i++){
+      const t = i/segs;
+      const sway = Math.sin(time*1.2 + p.ph + t*2.2) * 22*S * t;
+      ctx.lineTo(p.x + sway, sandTop + 10 - p.h*t);
+    }
+    ctx.stroke();
+    ctx.lineWidth = p.w*0.45; ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.stroke();
+  }
+}
+
+function drawSurface(){
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 4;
+  ctx.beginPath();
+  for(let x=0;x<=W;x+=8){
+    const y = waterTop + Math.sin(x*0.03 + time*2.2)*3 + Math.sin(x*0.011 - time*1.3)*3;
+    x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawFish(f){
+  const dir = f.vx > 0 ? 1 : -1;
+  const r = f.r;
+  ctx.save();
+  ctx.translate(f.x, f.y);
+  ctx.scale(dir, 1);
+  const wag = Math.sin(f.tailPh) * 0.25;
+
+  // kuyruk
+  ctx.fillStyle = f.color2;
+  ctx.beginPath();
+  ctx.moveTo(-r*0.75, 0);
+  ctx.lineTo(-r*1.5, -r*0.7 + wag*r*0.5);
+  ctx.lineTo(-r*1.25, 0);
+  ctx.lineTo(-r*1.5,  r*0.7 + wag*r*0.5);
+  ctx.closePath(); ctx.fill();
+
+  // sırt ve karın yüzgeci
+  ctx.beginPath(); ctx.moveTo(-r*0.35,-r*0.5); ctx.quadraticCurveTo(0,-r*1.15, r*0.45,-r*0.5); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-r*0.1, r*0.5); ctx.quadraticCurveTo(r*0.1, r*0.95, r*0.4, r*0.5); ctx.closePath(); ctx.fill();
+
+  // gövde
+  const g = ctx.createRadialGradient(r*0.2,-r*0.25,r*0.1, 0,0,r*1.1);
+  g.addColorStop(0, lighten(f.color, 0.25)); g.addColorStop(1, f.color);
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.ellipse(0,0,r,r*0.62,0,0,Math.PI*2); ctx.fill();
+
+  // çizgiler
+  if(f.stripes){
+    ctx.save(); ctx.beginPath(); ctx.ellipse(0,0,r,r*0.62,0,0,Math.PI*2); ctx.clip();
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.fillRect(-r*0.55,-r,r*0.16,2*r); ctx.fillRect(-r*0.2,-r,r*0.16,2*r);
+    ctx.restore();
+  }
+
+  // yan yüzgeç
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.beginPath(); ctx.ellipse(r*0.15, r*0.25, r*0.3, r*0.14, 0.5, 0, Math.PI*2); ctx.fill();
+
+  // göz
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(r*0.6,-r*0.17,r*0.15,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#1a1a2e'; ctx.beginPath(); ctx.arc(r*0.64,-r*0.17,r*0.08,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(r*0.67,-r*0.21,r*0.03,0,Math.PI*2); ctx.fill();
+
+  // ağız
+  ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = Math.max(1.5, r*0.05); ctx.lineCap='round';
+  ctx.beginPath(); ctx.arc(r*0.9, r*0.08, r*0.1, 0.2, Math.PI*0.8); ctx.stroke();
+  ctx.restore();
+
+  // harf (aynalanmaz)
+  const fs = r*0.95;
+  ctx.save();
+  ctx.font = `900 ${fs}px ${LETTER_FONT}`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = fs*0.16; ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+  const lx = f.x - dir*r*0.2, ly = f.y + (f.letter === f.letter.toLowerCase() ? -fs*0.06 : 0);
+  ctx.strokeText(f.letter, lx, ly);
+  ctx.fillStyle = '#fff';
+  ctx.fillText(f.letter, lx, ly);
+  ctx.restore();
+}
+
+function lighten(hex, amt){
+  const n = parseInt(hex.slice(1),16);
+  let r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  r = Math.round(r + (255-r)*amt); g = Math.round(g + (255-g)*amt); b = Math.round(b + (255-b)*amt);
+  return `rgb(${r},${g},${b})`;
+}
+
+function drawBubbles(){
+  for(const b of bubbles){
+    ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(b.x - b.r*0.35, b.y - b.r*0.35, b.r*0.25, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.fill();
+  }
+}
+function drawDrops(){
+  for(const d of drops){
+    ctx.globalAlpha = Math.max(0, Math.min(1, d.life));
+    ctx.fillStyle = '#bfe9ff';
+    ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawRod(){
+  const hx = hook.x, hy = hook.y;
+  const tipX = hx, tipY = Math.max(-10, waterTop - 110*S);
+  const handleX = hx + 260*S, handleY = -60*S;
+
+  // kamış
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#5b3a1e'; ctx.lineWidth = 10*S;
+  ctx.beginPath(); ctx.moveTo(handleX, handleY); ctx.quadraticCurveTo(hx + 120*S, tipY - 20*S, tipX, tipY); ctx.stroke();
+  ctx.strokeStyle = '#a0683a'; ctx.lineWidth = 5*S;
+  ctx.beginPath(); ctx.moveTo(handleX, handleY); ctx.quadraticCurveTo(hx + 120*S, tipY - 20*S, tipX, tipY); ctx.stroke();
+  // makara
+  ctx.fillStyle = '#ff6b6b'; ctx.beginPath(); ctx.arc(hx + 200*S, -18*S, 16*S, 0, Math.PI*2); ctx.fill();
+
+  // misina
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(tipX, tipY); ctx.lineTo(hx, hy - 16*S); ctx.stroke();
+
+  // şamandıra
+  if(hy > waterTop + 30){
+    const fy = waterTop + Math.sin(time*2.2 + hx*0.03)*3;
+    ctx.fillStyle = '#ff3d3d'; ctx.beginPath(); ctx.arc(hx, fy - 6*S, 9*S, Math.PI, 0); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(hx, fy - 6*S, 9*S, 0, Math.PI); ctx.fill();
+  }
+
+  // kanca
+  ctx.strokeStyle = '#e9ecef'; ctx.lineWidth = 4*S; ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(hx, hy - 16*S); ctx.lineTo(hx, hy + 4*S);
+  ctx.arc(hx - 8*S, hy + 4*S, 8*S, 0, Math.PI*0.95);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.lineWidth = 1.5; ctx.stroke();
+
+  // hedef halkası (serbestken)
+  if(hook.state === 'free' && hy > waterTop){
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 2; ctx.setLineDash([6,6]);
+    ctx.beginPath(); ctx.arc(hx, hy, fishRadius()*1.1 + Math.sin(time*5)*3, 0, Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
+
+function draw(){
+  drawBackground();
+  drawPlants();
+  drawBubbles();
+  let hooked = null;
+  for(const f of fishes){ if(f.hooked) hooked = f; else drawFish(f); }
+  if(hooked) drawFish(hooked);
+  drawSurface();
+  drawDrops();
+  if(running || hook.state !== 'free') drawRod();
+}
+
+/* =========================================================
+   DÖNGÜ
+   ========================================================= */
+function loop(ts){
+  const dt = Math.min(0.05, (ts - lastTs)/1000 || 0);
+  lastTs = ts;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+
+resize();
+initFishes();                 // giriş ekranının arkasında da balıklar yüzsün
+hook.x = W/2; hook.y = H*0.55;
+if('speechSynthesis' in window) speechSynthesis.getVoices();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
