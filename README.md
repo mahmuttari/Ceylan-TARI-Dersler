@@ -26,7 +26,7 @@ yoksa kanca su üstüne geri çıkar.
 - Yanlış harfli balık (M, m, U, u, H, h, V, Z) yakalanırsa "yanlış" sesi gelir, büyük olan sayaçtan 1 düşer ve balık suya geri düşer. Ekranda yazılı uyarı çıkmaz.
 - Hedef 15 büyük N ve 15 küçük n (toplam 30). Bir harf tamamlanınca yeni balıklar diğer harften gelir. İkisi de dolunca "Tebrikler" ekranı gösterilir ve alkış/tezahürat kaydı çalar.
 - Efekt sesleri tarayıcı içinde üretilir; final alkışı Wikimedia Commons'taki kamu malı "Clapping hurray.ogg" kaydıdır (yükleyen: starlite) ve dosyaya gömülüdür. Sağ alttaki 🔊 düğmesi tüm sesleri kapatır.
-- Tarayıcıda Türkçe ses varsa yönergeler ve yanlış uyarısı sesli de söylenir.
+- Tarayıcıda Türkçe ses varsa yanlış balıkta "Yanlış!" uyarısı sesli de söylenir.
 
 ## Yayın
 
