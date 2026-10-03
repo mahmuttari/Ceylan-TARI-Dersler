@@ -30,9 +30,9 @@ yoksa kanca su üstüne geri çıkar.
 
 ### Sihirbazın Şapkası (Hece Okuma)
 
-Smokinli sihirbazın masasındaki şapkadan heceler çıkar; öğrenciler heceyi okur,
-öğretmen "Okudum, Sıradaki" düğmesine (ya da şapkaya) dokunur, yıldız kazanılır
-ve yeni hece çıkar.
+Palyaço yüzlü, uzun şapkalı sihirbaz masasındaki şapkadan bir kart çıkarır ve
+kaldırdığı eliyle gösterir; öğrenciler heceyi okur, öğretmen "Okudum, Sıradaki"
+düğmesine (ya da şapkaya) dokunur, yıldız kazanılır ve yeni kart çıkar.
 
 - Giriş ekranında öğrenilen harfler seçilir (varsayılan: **a** ve **n**). Seçili
   harflerden heceler (An, Na), sesli + hece birleşimleri (Ana) ve iki heceli

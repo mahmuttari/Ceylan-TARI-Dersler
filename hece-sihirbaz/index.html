@@ -71,22 +71,20 @@
   .pill .num{font-size:1.5em;color:#ff9f1c;text-shadow:0 2px 0 rgba(0,0,0,.12)}
   .iconbtn{background:rgba(255,255,255,.92);border:0;border-radius:50%;width:48px;height:48px;font-size:24px;cursor:pointer;box-shadow:0 6px 18px rgba(60,30,90,.25)}
   #stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
-  #cardArea{position:absolute;left:0;right:0;top:9%;height:33%;display:flex;align-items:center;justify-content:center;pointer-events:none}
-  #hece{font-family:"OkulHarf","Fredoka","Arial Rounded MT Bold",sans-serif;font-weight:700;color:#3b2a5a;
-    font-size:clamp(72px,19vmin,190px);line-height:1;letter-spacing:.04em;
-    background:#fff;border-radius:34px;padding:.1em .35em .14em;border:6px solid #ffd166;
+  #hece{position:absolute;left:0;top:0;z-index:4;font-family:"OkulHarf","Fredoka","Arial Rounded MT Bold",sans-serif;font-weight:700;color:#3b2a5a;
+    font-size:clamp(64px,17vmin,170px);line-height:1;letter-spacing:.04em;white-space:nowrap;
+    background:#fff;border-radius:30px;padding:.1em .35em .14em;border:6px solid #ffd166;
     box-shadow:0 20px 50px rgba(60,30,90,.35),0 0 0 8px rgba(255,255,255,.6);opacity:0;transform:scale(.2);
-    pointer-events:none}
+    transform-origin:50% 100%;pointer-events:none}
+  #hece.move{transition:left .75s cubic-bezier(.2,1.1,.3,1),top .75s cubic-bezier(.2,1.2,.3,1),transform .75s cubic-bezier(.2,1.4,.4,1),opacity .25s}
+  #hece.fly{transition:left .5s ease-in,top .5s ease-in,transform .5s ease-in,opacity .45s}
   #hece.sayi{border-color:#2b9bd6;color:#1b4f8a}
   #hece small{display:block;font-family:"Fredoka",sans-serif;font-size:.22em;color:#2b9bd6;letter-spacing:.15em;line-height:1.1;margin-top:.05em}
-  #hece.pop{animation:pop .7s cubic-bezier(.2,1.4,.4,1) forwards}
-  #hece.fly{animation:fly .55s ease-in forwards}
-  @keyframes pop{0%{opacity:0;transform:translateY(34vh) scale(.15) rotate(-12deg)}60%{opacity:1;transform:translateY(-4vh) scale(1.08) rotate(3deg)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
-  @keyframes fly{0%{opacity:1;transform:translateY(0) scale(1) rotate(0)}100%{opacity:0;transform:translate(60vw,-30vh) scale(.6) rotate(25deg)}}
   #clownWrap{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:57%;max-height:640px;width:auto;aspect-ratio:360/520;cursor:pointer}
   #clown{width:100%;height:100%;display:block;animation:bob 2.6s ease-in-out infinite;transform-origin:50% 100%}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-  #wand{transform-origin:76px 160px}
+  #wand{transform-origin:96px 34px;transition:opacity .2s}
+  #clownWrap.holding #wand{opacity:0}
   #clownWrap.open #wand{animation:wave .7s ease-in-out}
   @keyframes wave{0%,100%{transform:rotate(0)}30%{transform:rotate(-40deg)}65%{transform:rotate(25deg)}}
   .blink{animation:blink 4s infinite}
@@ -96,7 +94,7 @@
   #mainBtn{position:absolute;right:16px;bottom:16px;z-index:6;font-size:clamp(18px,3.4vw,28px);padding:14px 26px}
   #hint{position:absolute;left:16px;bottom:16px;z-index:4;background:rgba(255,255,255,.85);border-radius:999px;
     padding:8px 16px;font-weight:700;color:#5a2d91;font-size:clamp(13px,2.2vw,17px);white-space:nowrap;pointer-events:none}
-  @media (max-width:600px){#hint{display:none} #mainBtn{right:50%;transform:translateX(50%);bottom:12px;white-space:nowrap} #clownWrap{height:46%} #cardArea{top:10%;height:34%}}
+  @media (max-width:600px){#hint{display:none} #mainBtn{right:50%;transform:translateX(50%);bottom:12px;white-space:nowrap} #clownWrap{height:50%}}
   #confetti{position:fixed;inset:0;z-index:30;pointer-events:none}
   .biglet{font-family:"OkulHarf","Fredoka",sans-serif;font-size:clamp(28px,6vw,52px);line-height:1.3;font-weight:700;margin:6px 0;color:#ff6b35;text-shadow:0 4px 0 #c74d1f}
 </style>
@@ -147,7 +145,6 @@
     <button class="iconbtn" id="soundBtn" title="Ses">🔊</button>
   </div>
   <div id="stage">
-    <div id="cardArea"><div id="hece">na</div></div>
     <div id="clownWrap" title="Şapkaya dokun!">
       <svg id="clown" viewBox="0 -80 360 520" xmlns="http://www.w3.org/2000/svg">
         <!-- pelerin -->
@@ -192,10 +189,10 @@
         <path d="M138 212 Q180 262 222 212 Q180 232 138 212 Z" fill="#fff"/>
         <path d="M144 218 Q180 254 216 218 Q180 240 144 218 Z" fill="#e63946"/>
         <circle cx="180" cy="196" r="15" fill="#ff3b3b"/><circle cx="175" cy="191" r="4.5" fill="#fff" opacity=".7"/>
-        <!-- kollar: sol el asayı kaldırmış -->
-        <path d="M116 272 Q70 232 76 168" stroke="#1c1c2e" stroke-width="26" fill="none" stroke-linecap="round"/>
-        <circle cx="76" cy="160" r="15" fill="#fff"/>
-        <g id="wand"><rect x="72" y="84" width="9" height="84" rx="4.5" fill="#1c1c2e"/><rect x="72" y="84" width="9" height="20" rx="4.5" fill="#fff" stroke="#1c1c2e" stroke-width="1"/></g>
+        <!-- kollar: sol el yukarıda (asa ya da kartı tutar) -->
+        <path d="M116 272 Q50 196 96 48" stroke="#1c1c2e" stroke-width="26" fill="none" stroke-linecap="round"/>
+        <circle cx="96" cy="34" r="16" fill="#fff"/>
+        <g id="wand"><rect x="92" y="-54" width="9" height="88" rx="4.5" fill="#1c1c2e"/><rect x="92" y="-54" width="9" height="20" rx="4.5" fill="#fff" stroke="#1c1c2e" stroke-width="1"/></g>
         <!-- sağ el şapkanın kenarında -->
         <path d="M244 272 Q298 304 286 362" stroke="#1c1c2e" stroke-width="26" fill="none" stroke-linecap="round"/>
         <circle cx="284" cy="370" r="15" fill="#fff"/>
@@ -213,6 +210,7 @@
         </g>
       </svg>
     </div>
+    <div id="hece">na</div>
     <button class="btn" id="mainBtn">🎩 Hece Çıkar</button>
     <div id="hint">Şapkaya dokun ya da düğmeye bas</div>
   </div>
@@ -311,28 +309,43 @@ function startGame(){
   ensureAudio(); applauseUnlock();
   try{ applause.pause(); applause.currentTime=0; }catch(e){}
   score=0; scoreEl.textContent='0'; goalEl.textContent=goal; queue=[]; current=null; busy=false;
-  heceEl.className=''; heceEl.style.opacity=0; lastWasNum=false;
+  heceEl.className=''; heceEl.style.opacity=0; lastWasNum=false; clownWrap.classList.remove('holding');
   mainBtn.textContent='🎩 Hece Çıkar';
   intro.classList.add('hidden'); win.classList.add('hidden'); game.classList.add('on');
 }
+// Sihirbazın konumları (SVG viewBox 0 -80 360 520)
+function svgPt(x,y){ const r=clownWrap.getBoundingClientRect(); return { x:r.left + r.width*(x/360), y:r.top + r.height*((y+80)/520) }; }
+const hatPos  = () => svgPt(180, 312);   // masadaki şapkanın ağzı
+const handPos = () => svgPt(96, 34);     // kaldırdığı eli
+// Kartın alt-orta noktasını p'ye yerleştir
+function placeCard(p, scale, opacity){
+  const w=heceEl.offsetWidth, h=heceEl.offsetHeight;
+  let left=p.x - w/2; left=Math.max(8, Math.min(innerWidth - w - 8, left));
+  let top=p.y - h + 10; top=Math.max(8, top);
+  heceEl.style.left=left+'px'; heceEl.style.top=top+'px';
+  heceEl.style.transform='scale('+scale+')'; heceEl.style.opacity=opacity;
+}
+window.addEventListener('resize', ()=>{ if(current && !busy) placeCard(handPos(),1,1); });
 function popHece(){
   if(busy) return; busy=true;
   current=nextItem();
   if(current.kind==='sayi'){ heceEl.innerHTML=current.text+'<small>'+'● '.repeat(+current.text).trim()+'</small>'; heceEl.className='sayi'; }
   else { heceEl.textContent=current.text; heceEl.className=''; }
+  placeCard(hatPos(), .15, 0);           // şapkanın içinden
   void heceEl.offsetWidth;
-  heceEl.style.opacity=''; clownWrap.classList.add('open'); popSound(); sparkle();
-  setTimeout(()=>{ heceEl.classList.add('pop'); }, 120);
-  setTimeout(()=>{ clownWrap.classList.remove('open'); busy=false; mainBtn.textContent='✅ Okudum, Sıradaki'; }, 750);
+  clownWrap.classList.add('open'); popSound(); sparkle();
+  setTimeout(()=>{ heceEl.classList.add('move'); clownWrap.classList.add('holding'); placeCard(handPos(), 1, 1); }, 150);   // eline uçar
+  setTimeout(()=>{ clownWrap.classList.remove('open'); busy=false; mainBtn.textContent='✅ Okudum, Sıradaki'; }, 950);
 }
 function readDone(){
   if(busy||!current) return; busy=true;
   score++; scoreEl.textContent=score; starSound();
-  heceEl.classList.remove('pop'); heceEl.classList.add('fly');
-  current=null;
-  setTimeout(()=>{ heceEl.className=''; heceEl.style.opacity=0; busy=false;
+  heceEl.classList.remove('move'); heceEl.classList.add('fly');
+  const p=handPos(); placeCard({x:p.x + innerWidth*0.6, y:p.y - innerHeight*0.25}, .5, 0);
+  current=null; clownWrap.classList.remove('holding');
+  setTimeout(()=>{ heceEl.className=''; busy=false;
     if(score>=goal){ endGame(); } else { popHece(); }
-  }, 600);
+  }, 550);
 }
 function endGame(){
   $('winLetters').textContent=readList().join('  ');
@@ -348,7 +361,7 @@ $('homeBtn').addEventListener('click', ()=>{ game.classList.remove('on'); intro.
 
 /* ---------- pırıltı ve konfeti ---------- */
 function sparkle(){
-  const r=clownWrap.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height*0.755;
+  const {x:cx, y:cy}=hatPos();
   const cols=['#ffd166','#ff5d8f','#2bc0a0','#2b9bd6','#fff','#ff6b35'];
   for(let i=0;i<18;i++){ const s=document.createElement('div'); s.className='spark'; s.style.left=cx+'px'; s.style.top=cy+'px'; s.style.background=pick(cols);
     const a=rnd(-Math.PI,0), d=rnd(60,180); s.style.setProperty('--dx',Math.cos(a)*d+'px'); s.style.setProperty('--dy',Math.sin(a)*d+'px');
