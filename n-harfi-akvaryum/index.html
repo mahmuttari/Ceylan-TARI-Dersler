@@ -275,6 +275,15 @@ function startAmbient(){
   ambientNodes = {src, g};
 }
 let nextAmbientBubble = 0;
+let lastBubbleSfx = 0;
+// Her baloncuk belirdiği anda çalan kısa "blup" (çok sık çalmasın diye 45 ms aralık)
+function bubbleSfxNow(vol=0.12){
+  if(!actx || !soundOn) return;
+  const t = actx.currentTime;
+  if(t - lastBubbleSfx < 0.045) return;
+  lastBubbleSfx = t;
+  bubbleSound(0, rnd(280, 650), vol, rnd(0.10, 0.16));
+}
 
 function setSound(on){
   soundOn = on;
@@ -447,8 +456,9 @@ function tryCatch(){
   if(best){
     best.hooked = true; best.falling = false;
     hook.fish = best; hook.state = 'reeling';
-    bubbleSound(0, 420, 0.2, 0.12);
-    spawnBubbles(best.x, best.y, 6, best.r);
+    // balık kancaya takılır takılmaz anında baloncuk sesleri
+    for(let i=0;i<4;i++) bubbleSound(i*0.06, 380 + i*120, 0.22, 0.13);
+    spawnBubbles(best.x, best.y, 8, best.r, false);
   }else{
     if(hook.y > waterTop){
       plopSound();
@@ -487,7 +497,8 @@ function resolveCatch(){
 }
 
 /* ---------- parçacıklar ---------- */
-function spawnBubbles(x, y, n, spread){
+function spawnBubbles(x, y, n, spread, sfx=true){
+  if(sfx && running) bubbleSfxNow(0.16);
   for(let i=0;i<n;i++){
     bubbles.push({ x: x + rnd(-spread,spread)*0.6, y: y + rnd(-spread,spread)*0.4,
       r: rnd(3,9)*S, vy: rnd(40,110)*S, wob: rnd(0,Math.PI*2), life: 1, ambient:false });
@@ -509,10 +520,13 @@ function update(dt){
 
   // ortam baloncukları
   if(time > nextAmbientBubble){
-    nextAmbientBubble = time + rnd(0.5, 1.6);
+    nextAmbientBubble = time + rnd(0.3, 1.0);
     const px = rnd(20, W-20);
-    bubbles.push({ x: px, y: sandTop - 4, r: rnd(3,8)*S, vy: rnd(35,70)*S, wob: rnd(0,Math.PI*2), life: 1, ambient:true });
-    if(running && Math.random() < 0.35) bubbleSound(0, rnd(250,450), 0.05, 0.12);
+    const cnt = Math.random() < 0.3 ? 3 : 1;          // ara sıra küçük baloncuk kümesi
+    for(let k=0;k<cnt;k++){
+      bubbles.push({ x: px + rnd(-14,14)*S, y: sandTop - 4 - k*10*S, r: rnd(3,8)*S, vy: rnd(35,70)*S, wob: rnd(0,Math.PI*2), life: 1, ambient:true });
+    }
+    if(running) bubbleSfxNow(0.09);
   }
 
   // balıklar
@@ -541,7 +555,7 @@ function update(dt){
     hook.y += (ty - hook.y) * Math.min(1, dt*12);
   }else if(hook.state === 'reeling'){
     hook.y -= 480*S*dt;
-    if(hook.fish && Math.random() < 0.5) spawnBubbles(hook.x, hook.y + hook.fish.r, 1, hook.fish.r*0.6);
+    if(hook.fish && Math.random() < 0.7) spawnBubbles(hook.x, hook.y + hook.fish.r, 2, hook.fish.r*0.6);
     if(hook.y <= waterTop - 10*S) resolveCatch();
   }else if(hook.state === 'returning'){
     const ty = Math.max(waterTop - 40, pointer.y);
@@ -556,7 +570,11 @@ function update(dt){
   for(let i=bubbles.length-1;i>=0;i--){
     const b = bubbles[i];
     b.y -= b.vy*dt; b.wob += dt*3; b.x += Math.sin(b.wob)*18*S*dt;
-    if(b.y < waterTop + 4){ bubbles.splice(i,1); if(Math.random()<0.25) spawnDropsSmall(b.x); }
+    if(b.y < waterTop + 4){
+      bubbles.splice(i,1);
+      if(Math.random()<0.25) spawnDropsSmall(b.x);
+      if(running && Math.random()<0.5) bubbleSfxNow(0.07);
+    }
   }
   // damlalar
   for(let i=drops.length-1;i>=0;i--){
