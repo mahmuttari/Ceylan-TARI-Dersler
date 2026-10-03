@@ -454,7 +454,7 @@ function buildPlants(){
   swimmers.push({ type:'octopus', x: rnd(W*0.15, W*0.85), baseY: rnd(waterTop + os*3, sandTop - os*4), y: 0,
     vx: (Math.random()<0.5?1:-1) * rnd(10, 16)*S, s: os, ph: rnd(0,6) });
   // fotoğraftaki gibi beyaz-pembe aksolotl (oltaya takılmaz)
-  const ax = Math.max(32, 46*S);
+  const ax = Math.max(22, 30*S);
   swimmers.push({ type:'axolotl', x: rnd(W*0.2, W*0.8), baseY: rnd(sandTop - ax*3.2, sandTop - ax*1.4), y: 0,
     vx: (Math.random()<0.5?1:-1) * rnd(12, 18)*S, s: ax, ph: rnd(0,6) });
   const ks = Math.max(15, 20*S);
