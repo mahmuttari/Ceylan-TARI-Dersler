@@ -19,11 +19,11 @@ bekler; öğrenci ekrana basılı tutarak (fare veya parmakla) kancayı suya ind
 Kanca balığa değince balık takılır ve olta onu kendiliğinden su yüzeyine çeker.
 Bırakınca kanca su üstüne geri çıkar.
 
-- Akvaryumda 20 balık yüzer; hem **büyük N** hem **küçük n** balıkları doğrudur.
+- Akvaryumda 30 balık yüzer (beta, japon balığı ve çatal kuyruklu türler); dipte salyangozlar, denizyıldızı ve midye vardır; hem **büyük N** hem **küçük n** balıkları doğrudur.
 - Balıklar ara sıra kendiliğinden hızlanır; kanca yaklaşınca bazen ürküp kaçar; takılan balık ara sıra yarı yolda kurtulur.
 - Doğru balık yakalanınca su sıçrama ve baloncuk sesi gelir, yıldız kazanılır.
 - Yanlış harfli balık (M, m, U, u, H, h, V, Z) yakalanırsa "yanlış" sesi gelir, bir yıldız gider ve balık suya geri düşer. Ekranda yazılı uyarı çıkmaz.
-- 10 yıldız toplanınca "Tebrikler" ekranı ve N ile başlayan kelimeler gösterilir.
+- 10 yıldız toplanınca "Tebrikler" ekranı gösterilir.
 - Sesler tarayıcı içinde üretilir; sağ alttaki 🔊 düğmesi ile kapatılabilir.
 - Tarayıcıda Türkçe ses varsa yönergeler ve yanlış uyarısı sesli de söylenir.
 

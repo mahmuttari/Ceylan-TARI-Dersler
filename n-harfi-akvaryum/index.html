@@ -66,10 +66,6 @@
   #sound{position:fixed;right:12px;bottom:12px;z-index:7;background:rgba(255,255,255,.9);border:0;border-radius:50%;
     width:52px;height:52px;font-size:26px;cursor:pointer;box-shadow:0 6px 18px rgba(0,30,60,.3)}
   #sound.hidden{display:none}
-  .words{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:6px 0 18px}
-  .words span{background:#fff3cd;border:3px solid #ffd166;border-radius:14px;padding:6px 14px;font-weight:800;
-    font-size:clamp(16px,3vw,22px);color:#7a4b00}
-  .words b{color:#ff3d7f}
 </style>
 </head>
 <body>
@@ -94,11 +90,7 @@
     <div class="teacher"><small>1/C Sınıf Öğretmeni</small>Ceylan Tarı</div>
     <h1>🎉 Tebrikler! 🎉</h1>
     <div class="biglet"><span>N</span> <span>n</span></div>
-    <p class="lead">Bütün N ve n balıklarını yakaladın!<br>N harfiyle başlayan kelimeler:</p>
-    <div class="words">
-      <span><b>N</b>ar</span><span><b>N</b>ane</span><span><b>N</b>ine</span>
-      <span><b>N</b>ehir</span><span><b>N</b>ohut</span><span><b>N</b>al</span>
-    </div>
+    <p class="lead">Bütün N ve n balıklarını yakaladın!</p>
     <button class="btn alt" id="againBtn">🔁 Tekrar Oyna</button>
   </div>
 </div>
@@ -120,7 +112,7 @@
    AYARLAR
    ========================================================= */
 const GOAL = 10;                       // kazanmak için gereken doğru yakalama
-const FISH_COUNT = 20;
+const FISH_COUNT = 30;
 const SCARE_CHANCE = 0.5;              // kanca yaklaşınca balığın ürküp kaçma olasılığı
 const SLIP_CHANCE  = 0.2;              // takılan balığın yarı yolda kurtulma olasılığı
 const BURST_RATE   = 0.10;             // balığın kendiliğinden ani hızlanma olasılığı (saniyede)
@@ -350,7 +342,7 @@ window.addEventListener('resize', resize);
 const rnd = (a,b) => a + Math.random()*(b-a);
 const pick = arr => arr[Math.floor(Math.random()*arr.length)];
 
-let fishes = [], bubbles = [], drops = [], plants = [], pebbles = [];
+let fishes = [], bubbles = [], drops = [], plants = [], pebbles = [], critters = [];
 let score = 0, running = false, time = 0, lastTs = 0;
 const pointer = { x: W/2, y: H/2, inside:false };
 const hook = { x: 0, y: 0, state: 'free', fish: null, held: false };  // free | reeling | returning
@@ -358,7 +350,7 @@ let catchCooldown = 0;   // yakalamadan sonra kısa bekleme (sn)
 const restY = () => waterTop - 26*S;   // olta tutulmazken kancanın beklediği yükseklik (su üstü)
 let msgTimer = 0;
 
-function fishRadius(){ return Math.max(23, 36*S); }
+function fishRadius(){ return Math.max(21, 32*S); }
 
 function makeFish(letter, fromEdge){
   const r = fishRadius() * rnd(0.85, 1.2);
@@ -370,7 +362,8 @@ function makeFish(letter, fromEdge){
     baseY: rnd(minY, maxY), amp: rnd(6, 18)*S, wf: rnd(0.8,1.6), ph: rnd(0,Math.PI*2),
     vx: dir * rnd(35, 75) * S,
     x: fromEdge ? (dir>0 ? -r*2 : W + r*2) : rnd(r, W-r),
-    y: 0, hooked:false, falling:false, dash:0, scareCd:0, slipAt:null, tailPh: rnd(0,Math.PI*2), stripes: Math.random()<0.5
+    y: 0, hooked:false, falling:false, dash:0, scareCd:0, slipAt:null, tailPh: rnd(0,Math.PI*2), stripes: Math.random()<0.5,
+    kind: pick(['betta','betta','goldfish','fork'])
   };
   f.y = f.baseY;
   return f;
@@ -378,7 +371,7 @@ function makeFish(letter, fromEdge){
 
 function initFishes(){
   fishes = [];
-  const letters = ['N','N','N','N','N','N','n','n','n','n','n','n'];
+  const letters = ['N','N','N','N','N','N','N','N','N','n','n','n','n','n','n','n','n','n'];
   while(letters.length < FISH_COUNT) letters.push(pick(DISTRACTORS));
   letters.sort(()=>Math.random()-0.5);
   letters.forEach(l => fishes.push(makeFish(l, false)));
@@ -394,6 +387,17 @@ function buildPlants(){
   for(let i=0;i<Math.round(W/60);i++){
     pebbles.push({ x: rnd(0,W), y: rnd(sandTop+8, H-6), r: rnd(4,11)*S, c: pick(['#c9a97a','#b08d5b','#e0c38e','#9e7b4f']) });
   }
+  // dip canlıları
+  critters = [];
+  const cs = Math.max(11, 15*S);
+  const nSnail = Math.max(2, Math.round(W/420));
+  for(let i=0;i<nSnail;i++){
+    critters.push({ type:'snail', x: rnd(40, W-40), dir: Math.random()<0.5?1:-1, speed: rnd(7,14)*S, s: cs*rnd(0.9,1.2),
+      shell: pick(['#f4a261','#e76f51','#c77dff','#ffd166','#80ed99']), body: pick(['#8fd14f','#f9c74f','#90e0ef']), ph: rnd(0,6) });
+  }
+  critters.push({ type:'star', x: rnd(60, W-60), s: cs*1.2, color: pick(['#ff7b54','#ff5d8f','#ffb703']), ph: rnd(0,6) });
+  critters.push({ type:'clam', x: rnd(60, W-60), s: cs*1.1, color: pick(['#b5838d','#6d6875','#e5989b']), ph: rnd(0,6) });
+  if(W > 700) critters.push({ type:'star', x: rnd(60, W-60), s: cs, color: '#ffb703', ph: rnd(0,6) });
 }
 
 function renderStars(){
@@ -638,6 +642,14 @@ function update(dt){
   hook.x = Math.max(10, Math.min(W-10, hook.x));
   hook.y = Math.max(restY() - 10, Math.min(H - 10, hook.y));
 
+  // salyangozlar yavaşça sürünür
+  for(const c of critters){
+    if(c.type !== 'snail') continue;
+    c.x += c.dir * c.speed * dt;
+    if(c.x > W - 30 && c.dir > 0) c.dir = -1;
+    if(c.x < 30 && c.dir < 0) c.dir = 1;
+  }
+
   // baloncuklar
   for(let i=bubbles.length-1;i>=0;i--){
     const b = bubbles[i];
@@ -695,6 +707,78 @@ function drawBackground(){
   for(const p of pebbles){ ctx.fillStyle = p.c; ctx.beginPath(); ctx.ellipse(p.x,p.y,p.r,p.r*0.7,0,0,Math.PI*2); ctx.fill(); }
 }
 
+function drawCritters(){
+  for(const c of critters){
+    const s = c.s, y = sandTop + 10;
+    ctx.save(); ctx.translate(c.x, y);
+    if(c.type === 'snail'){
+      ctx.scale(c.dir, 1);
+      const stretch = 1 + Math.sin(time*3 + c.ph)*0.08;
+      // gövde
+      ctx.fillStyle = c.body;
+      ctx.beginPath(); ctx.ellipse(0.1*s, -0.3*s, 1.3*s*stretch, 0.38*s, 0, 0, Math.PI*2); ctx.fill();
+      // baş
+      ctx.beginPath(); ctx.arc(1.15*s*stretch, -0.55*s, 0.42*s, 0, Math.PI*2); ctx.fill();
+      // gözler (saplı)
+      ctx.strokeStyle = c.body; ctx.lineWidth = Math.max(1.5, 0.12*s); ctx.lineCap='round';
+      for(const o of [-0.15, 0.2]){
+        const ex = (1.15 + o)*s*stretch, ey = -0.8*s;
+        ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex + 0.15*s, ey - 0.7*s); ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ex + 0.17*s, ey - 0.78*s, 0.14*s, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#1a1a2e'; ctx.beginPath(); ctx.arc(ex + 0.2*s, ey - 0.78*s, 0.07*s, 0, Math.PI*2); ctx.fill();
+      }
+      // ağız
+      ctx.strokeStyle='rgba(0,0,0,0.3)'; ctx.lineWidth=Math.max(1,0.07*s);
+      ctx.beginPath(); ctx.arc(1.25*s*stretch, -0.45*s, 0.14*s, 0.2, Math.PI-0.2); ctx.stroke();
+      // kabuk (spiral)
+      ctx.fillStyle = c.shell;
+      ctx.beginPath(); ctx.arc(-0.3*s, -0.95*s, 0.85*s, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.28)'; ctx.lineWidth = Math.max(1.2, 0.09*s);
+      ctx.beginPath();
+      for(let a=0; a<=Math.PI*4.5; a+=0.2){
+        const rr = 0.08*s + a*0.058*s;
+        const px = -0.3*s + Math.cos(a)*rr, py = -0.95*s + Math.sin(a)*rr;
+        a===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.beginPath(); ctx.arc(-0.55*s, -1.25*s, 0.22*s, 0, Math.PI*2); ctx.fill();
+    }else if(c.type === 'star'){
+      ctx.rotate(Math.sin(time*0.8 + c.ph)*0.08);
+      ctx.fillStyle = c.color;
+      ctx.beginPath();
+      for(let i=0;i<10;i++){
+        const a = -Math.PI/2 + i*Math.PI/5;
+        const rr = (i%2===0 ? 1.15 : 0.5)*s;
+        const px = Math.cos(a)*rr, py = -0.5*s + Math.sin(a)*rr;
+        i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+      }
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle='rgba(0,0,0,0.18)'; ctx.lineWidth=Math.max(1,0.06*s); ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,0.45)';
+      for(let i=0;i<5;i++){ const a=-Math.PI/2+i*2*Math.PI/5; ctx.beginPath(); ctx.arc(Math.cos(a)*0.6*s, -0.5*s+Math.sin(a)*0.6*s, 0.1*s, 0, Math.PI*2); ctx.fill(); }
+      ctx.beginPath(); ctx.arc(0,-0.5*s,0.14*s,0,Math.PI*2); ctx.fill();
+    }else if(c.type === 'clam'){
+      const open = Math.max(0, Math.sin(time*0.6 + c.ph) - 0.3) * 0.9;   // ara sıra açılır
+      // alt kabuk
+      ctx.fillStyle = c.color;
+      ctx.beginPath(); ctx.ellipse(0, -0.2*s, 1.1*s, 0.55*s, 0, 0, Math.PI); ctx.fill();
+      // inci
+      if(open > 0.05){
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(0, -0.45*s, 0.3*s, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.beginPath(); ctx.arc(-0.1*s, -0.55*s, 0.1*s, 0, Math.PI*2); ctx.fill();
+      }
+      // üst kabuk (menteşe arkada)
+      ctx.save(); ctx.translate(-1.1*s, -0.2*s); ctx.rotate(-open); ctx.translate(1.1*s, 0.2*s);
+      ctx.fillStyle = lighten(c.color, 0.2);
+      ctx.beginPath(); ctx.ellipse(0, -0.2*s, 1.1*s, 0.55*s, 0, Math.PI, Math.PI*2); ctx.fill();
+      ctx.strokeStyle='rgba(0,0,0,0.2)'; ctx.lineWidth=Math.max(1,0.06*s);
+      for(let i=-2;i<=2;i++){ ctx.beginPath(); ctx.moveTo(0,-0.2*s); ctx.lineTo(i*0.42*s, -0.2*s - Math.sqrt(Math.max(0,1-(i*0.42/1.1)**2))*0.55*s); ctx.stroke(); }
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+}
+
 function drawPlants(){
   for(const p of plants){
     ctx.strokeStyle = p.color; ctx.lineCap = 'round'; ctx.lineWidth = p.w;
@@ -725,50 +809,104 @@ function drawSurface(){
 function drawFish(f){
   const dir = f.vx > 0 ? 1 : -1;
   const r = f.r;
+  const ph = f.kind === 'betta' ? f.tailPh*0.6 : f.tailPh;
+  const sway = Math.sin(ph) * 0.18;             // kuyruk salınımı
   ctx.save();
   ctx.translate(f.x, f.y);
   ctx.scale(dir, 1);
-  const wag = Math.sin(f.tailPh) * 0.25;
 
-  // kuyruk
+  // --- kuyruk ---
   ctx.fillStyle = f.color2;
-  ctx.beginPath();
-  ctx.moveTo(-r*0.75, 0);
-  ctx.lineTo(-r*1.5, -r*0.7 + wag*r*0.5);
-  ctx.lineTo(-r*1.25, 0);
-  ctx.lineTo(-r*1.5,  r*0.7 + wag*r*0.5);
-  ctx.closePath(); ctx.fill();
-
-  // sırt ve karın yüzgeci
-  ctx.beginPath(); ctx.moveTo(-r*0.35,-r*0.5); ctx.quadraticCurveTo(0,-r*1.15, r*0.45,-r*0.5); ctx.closePath(); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(-r*0.1, r*0.5); ctx.quadraticCurveTo(r*0.1, r*0.95, r*0.4, r*0.5); ctx.closePath(); ctx.fill();
-
-  // gövde
-  const g = ctx.createRadialGradient(r*0.2,-r*0.25,r*0.1, 0,0,r*1.1);
-  g.addColorStop(0, lighten(f.color, 0.25)); g.addColorStop(1, f.color);
-  ctx.fillStyle = g;
-  ctx.beginPath(); ctx.ellipse(0,0,r,r*0.62,0,0,Math.PI*2); ctx.fill();
-
-  // çizgiler
-  if(f.stripes){
-    ctx.save(); ctx.beginPath(); ctx.ellipse(0,0,r,r*0.62,0,0,Math.PI*2); ctx.clip();
-    ctx.fillStyle = 'rgba(255,255,255,0.22)';
-    ctx.fillRect(-r*0.55,-r,r*0.16,2*r); ctx.fillRect(-r*0.2,-r,r*0.16,2*r);
-    ctx.restore();
+  ctx.globalAlpha = 0.85;
+  if(f.kind === 'betta'){
+    // tül kuyruk: dalgalı kenarlı büyük yelpaze
+    const bx = -0.6*r;
+    ctx.beginPath(); ctx.moveTo(bx, 0);
+    for(let a=-80; a<=80; a+=6){
+      const t = a/80, rad = a*Math.PI/180;
+      const R = r*(1.4 - 0.3*Math.abs(t)) + Math.sin(a*0.16 + ph*1.6)*0.08*r;
+      ctx.lineTo(bx - Math.cos(rad)*R, Math.sin(rad)*R*0.9 + sway*R*0.9);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.28)'; ctx.lineWidth = Math.max(1, r*0.03);
+    for(let a=-60; a<=60; a+=30){
+      const rad=a*Math.PI/180, R=r*1.25;
+      ctx.beginPath(); ctx.moveTo(bx,0); ctx.lineTo(bx-Math.cos(rad)*R, Math.sin(rad)*R*0.9+sway*R*0.9); ctx.stroke();
+    }
+  }else if(f.kind === 'goldfish'){
+    // çift loblu yelpaze kuyruk
+    const bx = -0.7*r, sw = sway*r;
+    for(const sg of [-1, 1]){
+      ctx.beginPath(); ctx.moveTo(bx, 0);
+      ctx.bezierCurveTo(bx-0.5*r, sg*0.1*r + sw*0.5, bx-1.4*r, sg*1.05*r + sw, bx-1.15*r, sg*0.35*r + sw*0.8);
+      ctx.bezierCurveTo(bx-0.9*r, sg*0.2*r + sw*0.5, bx-0.6*r, sg*0.05*r, bx, 0);
+      ctx.fill();
+    }
+  }else{
+    // çatal kuyruk
+    const wag = sway*r;
+    ctx.beginPath();
+    ctx.moveTo(-0.7*r, 0);
+    ctx.quadraticCurveTo(-1.1*r, -0.2*r + wag*0.3, -1.45*r, -0.75*r + wag);
+    ctx.quadraticCurveTo(-1.15*r, 0, -1.45*r, 0.75*r + wag);
+    ctx.quadraticCurveTo(-1.1*r, 0.2*r + wag*0.3, -0.7*r, 0);
+    ctx.fill();
   }
 
-  // yan yüzgeç
-  ctx.fillStyle = 'rgba(255,255,255,0.35)';
-  ctx.beginPath(); ctx.ellipse(r*0.15, r*0.25, r*0.3, r*0.14, 0.5, 0, Math.PI*2); ctx.fill();
+  // --- sırt ve karın yüzgeçleri ---
+  const fw = Math.sin(ph*0.9)*0.07*r;
+  if(f.kind === 'betta'){
+    ctx.beginPath(); ctx.moveTo(-0.55*r, -0.42*r);
+    ctx.bezierCurveTo(-0.5*r, -1.1*r + fw, 0.15*r, -1.0*r - fw, 0.5*r, -0.4*r); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-0.6*r, 0.4*r);
+    ctx.bezierCurveTo(-0.6*r, 1.1*r - fw, 0.05*r, 0.95*r + fw, 0.35*r, 0.4*r); ctx.closePath(); ctx.fill();
+  }else{
+    ctx.beginPath(); ctx.moveTo(-0.4*r, -0.45*r);
+    ctx.quadraticCurveTo(-0.05*r, -0.95*r + fw, 0.4*r, -0.45*r); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-0.2*r, 0.45*r);
+    ctx.quadraticCurveTo(0.05*r, 0.85*r - fw, 0.35*r, 0.45*r); ctx.closePath(); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // --- gövde ---
+  const g = ctx.createRadialGradient(0.25*r, -0.25*r, 0.1*r, 0, 0, 1.1*r);
+  g.addColorStop(0, lighten(f.color, 0.35)); g.addColorStop(0.7, f.color); g.addColorStop(1, darken(f.color, 0.22));
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.bezierCurveTo(0.8*r, -0.62*r, -0.4*r, -0.64*r, -0.8*r, -0.15*r);
+  ctx.bezierCurveTo(-0.9*r, 0, -0.9*r, 0, -0.8*r, 0.15*r);
+  ctx.bezierCurveTo(-0.4*r, 0.64*r, 0.8*r, 0.62*r, r, 0);
+  ctx.closePath(); ctx.fill();
+
+  // pullar / çizgiler ve karın parlaklığı (gövdeye kırpılı)
+  ctx.save(); ctx.clip();
+  if(f.stripes){
+    ctx.fillStyle='rgba(255,255,255,0.22)';
+    ctx.fillRect(-0.5*r,-r,0.15*r,2*r); ctx.fillRect(-0.15*r,-r,0.15*r,2*r);
+  }else{
+    ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=Math.max(1,r*0.04);
+    for(let i=-2;i<=1;i++){ ctx.beginPath(); ctx.arc(-0.2*r + i*0.28*r, 0, 0.42*r, -1.1, 1.1); ctx.stroke(); }
+  }
+  ctx.fillStyle='rgba(255,255,255,0.18)';
+  ctx.beginPath(); ctx.ellipse(0.1*r, 0.3*r, 0.6*r, 0.22*r, 0, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  // yan yüzgeç (çırpınır)
+  ctx.fillStyle = f.color2; ctx.globalAlpha = 0.8;
+  const pf = Math.sin(ph*1.3)*0.12*r;
+  ctx.beginPath(); ctx.moveTo(0.15*r, 0.12*r);
+  ctx.quadraticCurveTo(-0.15*r, 0.35*r + pf, -0.3*r, 0.55*r + pf);
+  ctx.quadraticCurveTo(0.05*r, 0.5*r, 0.15*r, 0.12*r); ctx.fill();
+  ctx.globalAlpha = 1;
 
   // göz
-  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(r*0.6,-r*0.17,r*0.15,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#1a1a2e'; ctx.beginPath(); ctx.arc(r*0.64,-r*0.17,r*0.08,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(r*0.67,-r*0.21,r*0.03,0,Math.PI*2); ctx.fill();
-
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(0.6*r,-0.15*r,0.15*r,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#1a1a2e'; ctx.beginPath(); ctx.arc(0.64*r,-0.15*r,0.085*r,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(0.67*r,-0.2*r,0.035*r,0,Math.PI*2); ctx.fill();
   // ağız
-  ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = Math.max(1.5, r*0.05); ctx.lineCap='round';
-  ctx.beginPath(); ctx.arc(r*0.9, r*0.08, r*0.1, 0.2, Math.PI*0.8); ctx.stroke();
+  ctx.strokeStyle='rgba(0,0,0,0.35)'; ctx.lineWidth=Math.max(1.5,r*0.05); ctx.lineCap='round';
+  ctx.beginPath(); ctx.arc(0.9*r, 0.1*r, 0.1*r, 0.3, Math.PI*0.8); ctx.stroke();
   ctx.restore();
 
   // harf (aynalanmaz)
@@ -783,6 +921,13 @@ function drawFish(f){
   ctx.fillStyle = '#fff';
   ctx.fillText(f.letter, lx, ly);
   ctx.restore();
+}
+
+function darken(hex, amt){
+  const n = parseInt(hex.slice(1),16);
+  let r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  r = Math.round(r*(1-amt)); g = Math.round(g*(1-amt)); b = Math.round(b*(1-amt));
+  return `rgb(${r},${g},${b})`;
 }
 
 function lighten(hex, amt){
@@ -856,6 +1001,7 @@ function drawRod(){
 function draw(){
   drawBackground();
   drawPlants();
+  drawCritters();
   drawBubbles();
   let hooked = null;
   for(const f of fishes){ if(f.hooked) hooked = f; else drawFish(f); }
