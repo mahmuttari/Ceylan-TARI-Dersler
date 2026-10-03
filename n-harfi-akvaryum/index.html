@@ -449,7 +449,7 @@ function buildPlants(){
       vx: (Math.random()<0.5?1:-1) * rnd(6, 11)*S, s: ss*rnd(0.9,1.1), ph: rnd(0,6),
       color: pick(['#ffb703','#ff8fab','#8ecae6','#ffd166','#c77dff']) });
   }
-  // küçük mor ahtapot (oltaya takılmaz)
+  // küçük turuncu ahtapot (oltaya takılmaz)
   const os = Math.max(16, 24*S);
   swimmers.push({ type:'octopus', x: rnd(W*0.15, W*0.85), baseY: rnd(waterTop + os*3, sandTop - os*4), y: 0,
     vx: (Math.random()<0.5?1:-1) * rnd(10, 16)*S, s: os, ph: rnd(0,6) });
@@ -887,9 +887,9 @@ function drawSwimmers(){
   for(const w of swimmers){
     const s = w.s;
     ctx.save(); ctx.translate(w.x, w.y);
-    if(w.type === 'octopus'){            // küçük mor ahtapot
+    if(w.type === 'octopus'){            // küçük turuncu ahtapot
       // sekiz dalgalı kol
-      ctx.strokeStyle = '#6d3fc7'; ctx.lineCap = 'round';
+      ctx.strokeStyle = '#d9480f'; ctx.lineCap = 'round';
       for(let i=0;i<8;i++){
         const a = (i/7 - 0.5) * 2.4;                  // yayılma açısı
         const wv = Math.sin(time*2.2 + w.ph + i*0.9);
@@ -906,7 +906,7 @@ function drawSwimmers(){
       }
       // baş
       const g = ctx.createRadialGradient(-0.3*s, -0.9*s, 0.1*s, 0, -0.5*s, 1.3*s);
-      g.addColorStop(0, '#b794ff'); g.addColorStop(1, '#6d3fc7');
+      g.addColorStop(0, '#ff922b'); g.addColorStop(1, '#d9480f');
       ctx.fillStyle = g;
       ctx.beginPath(); ctx.ellipse(0, -0.45*s, 1.0*s, 1.15*s, 0, 0, Math.PI*2); ctx.fill();
       // gözler
@@ -917,7 +917,7 @@ function drawSwimmers(){
         ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ex*s + look + 0.05*s, -0.4*s, 0.05*s, 0, Math.PI*2); ctx.fill();
       }
       // gülümseme
-      ctx.strokeStyle = 'rgba(40,10,80,0.7)'; ctx.lineWidth = Math.max(1.5, 0.06*s);
+      ctx.strokeStyle = 'rgba(90,30,0,0.7)'; ctx.lineWidth = Math.max(1.5, 0.06*s);
       ctx.beginPath(); ctx.arc(0, 0.05*s, 0.22*s, 0.2, Math.PI - 0.2); ctx.stroke();
     }else if(w.type === 'axolotl'){
       ctx.scale(w.vx >= 0 ? 1 : -1, 1);
