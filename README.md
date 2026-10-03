@@ -20,11 +20,11 @@ Parmak basılıyken kanca balığa takılmaz; kanca balığın üstündeyken par
 bırakılınca balık takılır ve olta onu kendiliğinden su yüzeyine çeker. Balık
 yoksa kanca su üstüne geri çıkar.
 
-- Akvaryumda 20 balık yüzer (beta, japon balığı ve çatal kuyruklu türler); dipte salyangozlar, denizyıldızı ve midye, suda oltaya takılmayan deniz atları ve karidesler vardır; hem **büyük N** hem **küçük n** balıkları doğrudur.
+- Akvaryumda 20 balık yüzer (beta, japon balığı ve çatal kuyruklu türler); dipte salyangozlar, denizyıldızı ve midye, suda oltaya takılmayan deniz atları, karidesler ve siyah bir ahtapot vardır; hem **büyük N** hem **küçük n** balıkları doğrudur.
 - Balıklar ara sıra kendiliğinden hızlanır; kanca yaklaşınca bazen ürküp kaçar; takılan balık ara sıra yarı yolda kurtulur.
-- Doğru balık yakalanınca su sıçrama ve baloncuk sesi gelir, sayaç 1 artar.
-- Yanlış harfli balık (M, m, U, u, H, h, V, Z) yakalanırsa "yanlış" sesi gelir, sayaç 1 azalır ve balık suya geri düşer. Ekranda yazılı uyarı çıkmaz.
-- Sayaç 30 olunca "Tebrikler" ekranı gösterilir ve alkış/tezahürat kaydı çalar.
+- Doğru balık yakalanınca su sıçrama ve baloncuk sesi gelir, o harfin sayacı 1 artar.
+- Yanlış harfli balık (M, m, U, u, H, h, V, Z) yakalanırsa "yanlış" sesi gelir, büyük olan sayaçtan 1 düşer ve balık suya geri düşer. Ekranda yazılı uyarı çıkmaz.
+- Hedef 15 büyük N ve 15 küçük n (toplam 30). Bir harf tamamlanınca yeni balıklar diğer harften gelir. İkisi de dolunca "Tebrikler" ekranı gösterilir ve alkış/tezahürat kaydı çalar.
 - Efekt sesleri tarayıcı içinde üretilir; final alkışı Wikimedia Commons'taki kamu malı "Clapping hurray.ogg" kaydıdır (yükleyen: starlite) ve dosyaya gömülüdür. Sağ alttaki 🔊 düğmesi tüm sesleri kapatır.
 - Tarayıcıda Türkçe ses varsa yönergeler ve yanlış uyarısı sesli de söylenir.
 
