@@ -19,7 +19,8 @@ bekler; öğrenci ekrana basılı tutarak (fare veya parmakla) kancayı suya ind
 Kanca balığa değince balık takılır ve olta onu kendiliğinden su yüzeyine çeker.
 Bırakınca kanca su üstüne geri çıkar.
 
-- Hem **büyük N** hem **küçük n** balıkları doğrudur.
+- Akvaryumda 20 balık yüzer; hem **büyük N** hem **küçük n** balıkları doğrudur.
+- Kanca yaklaşınca balıklar bazen ürküp hızla kaçar; takılan balık ara sıra yarı yolda kurtulur.
 - Doğru balık yakalanınca su sıçrama ve baloncuk sesi gelir, yıldız kazanılır.
 - Yanlış harfli balık (M, m, U, u, H, h, V, Z) yakalanırsa "yanlış" sesi ve sesli uyarı verilir, balık suya geri düşer.
 - 10 yıldız toplanınca "Tebrikler" ekranı ve N ile başlayan kelimeler gösterilir.
