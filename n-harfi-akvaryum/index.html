@@ -344,22 +344,8 @@ function setSound(on){
   soundBtn.textContent = on ? '🔊' : '🔇';
   if(master) master.gain.setTargetAtTime(on?1:0, actx.currentTime, 0.05);
   try{ applause.muted = !on; if(!on) applause.pause(); }catch(e){}
-  if(!on && 'speechSynthesis' in window) speechSynthesis.cancel();
 }
 soundBtn.addEventListener('click', e => { e.stopPropagation(); ensureAudio(); setSound(!soundOn); });
-
-// Türkçe seslendirme (varsa)
-function say(text){
-  if(!soundOn || !('speechSynthesis' in window)) return;
-  try{
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'tr-TR'; u.rate = 0.9; u.pitch = 1.1;
-    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith('tr'));
-    if(v) u.voice = v;
-    speechSynthesis.speak(u);
-  }catch(e){}
-}
 
 /* =========================================================
    TUVAL / BOYUT
@@ -617,7 +603,6 @@ function resolveCatch(){
     wrongSound();
     const L = counts.N >= counts.n ? 'N' : 'n';     // yanlış balık: büyük olan sayaçtan eksi 1
     counts[L]--; renderStars(L); showDelta(-1);
-    setTimeout(() => say('Yanlış! Bu ' + f.letter + ' harfi. N değil.'), 450);
     // balık suya geri düşer
     f.hooked = false; f.falling = true;
     f.baseY = rnd(waterTop + f.r*1.6, sandTop - f.r*1.4);
@@ -1319,7 +1304,6 @@ function loop(ts){
 resize();
 initFishes();                 // giriş ekranının arkasında da balıklar yüzsün
 hook.x = W/2; hook.y = H*0.55;
-if('speechSynthesis' in window) speechSynthesis.getVoices();
 requestAnimationFrame(loop);
 })();
 </script>
