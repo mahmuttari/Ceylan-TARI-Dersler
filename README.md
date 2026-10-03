@@ -8,6 +8,7 @@
 | --- | --- | --- |
 | 🔎 A Harfi Bulma Oyunu | A / a harfini bulma | [dersler/a-harfi-bulma-oyunu.html](dersler/a-harfi-bulma-oyunu.html) |
 | 🐠 N Harfi Akvaryumu | N / n harfini tanıma, büyük–küçük harf ayrımı | [n-harfi-akvaryum/index.html](n-harfi-akvaryum/index.html) |
+| 🎪 Palyaçonun Şapkası | Öğrenilen harflerle hece okuma | [hece-palyaco/index.html](hece-palyaco/index.html) |
 
 Her ders tek bir HTML dosyasıdır; yazı tipi ve sesler dosyanın içine gömülüdür, internet olmadan da çalışır.
 Ana sayfa (`index.html`) tüm dersleri listeler.
@@ -27,6 +28,20 @@ yoksa kanca su üstüne geri çıkar.
 - Hedef 15 büyük N ve 15 küçük n (toplam 30). Bir harf tamamlanınca yeni balıklar diğer harften gelir. İkisi de dolunca "Tebrikler" ekranı gösterilir ve alkış/tezahürat kaydı çalar.
 - Efekt sesleri tarayıcı içinde üretilir; final alkışı Wikimedia Commons'taki kamu malı "Clapping hurray.ogg" kaydıdır (yükleyen: starlite) ve dosyaya gömülüdür. Sağ alttaki 🔊 düğmesi tüm sesleri kapatır.
 
+### Palyaçonun Şapkası (Hece Okuma)
+
+Palyaçonun şapkasından heceler çıkar; öğrenciler heceyi okur, öğretmen "Okudum,
+Sıradaki" düğmesine (ya da şapkaya) dokunur, yıldız kazanılır ve yeni hece çıkar.
+
+- Giriş ekranında öğrenilen harfler seçilir (varsayılan: **a** ve **n**). Heceler
+  seçili sessiz + sesli (na) ve sesli + sessiz (an) biçiminde üretilir; bazıları
+  büyük harfle başlar (Na, An).
+- "Kelimeler de çıksın" seçilirse yalnızca seçili harflerden oluşan basit
+  kelimeler de (ana, nane, elma…) karışır.
+- Hece sayısı 10 / 20 / 30 seçilebilir; hedefe ulaşınca konfeti ve alkış.
+- Heceler A Harfi oyunundaki gömülü "OkulHarf" yazı tipiyle (dik temel harfler,
+  tek katlı "a") gösterilir. Palyaçonun burnuna dokununca korna çalar.
+
 ## Yayın
 
 Site GitHub Pages ile `gh-pages` dalından yayınlanır. `main` dalına her gönderimde
@@ -35,3 +50,4 @@ Site GitHub Pages ile `gh-pages` dalından yayınlanır. `main` dalına her gön
 - Ana sayfa: https://mahmuttari.github.io/Ceylan-TARI-Dersler/
 - A Harfi Bulma Oyunu: https://mahmuttari.github.io/Ceylan-TARI-Dersler/dersler/a-harfi-bulma-oyunu.html
 - N Harfi Akvaryumu: https://mahmuttari.github.io/Ceylan-TARI-Dersler/n-harfi-akvaryum/
+- Palyaçonun Şapkası: https://mahmuttari.github.io/Ceylan-TARI-Dersler/hece-palyaco/
