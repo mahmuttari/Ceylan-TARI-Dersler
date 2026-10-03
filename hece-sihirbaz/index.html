@@ -71,9 +71,9 @@
   .pill .num{font-size:1.5em;color:#ff9f1c;text-shadow:0 2px 0 rgba(0,0,0,.12)}
   .iconbtn{background:rgba(255,255,255,.92);border:0;border-radius:50%;width:48px;height:48px;font-size:24px;cursor:pointer;box-shadow:0 6px 18px rgba(60,30,90,.25)}
   #stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
-  #cardArea{position:absolute;left:0;right:0;top:12%;height:38%;display:flex;align-items:center;justify-content:center;pointer-events:none}
+  #cardArea{position:absolute;left:0;right:0;top:9%;height:33%;display:flex;align-items:center;justify-content:center;pointer-events:none}
   #hece{font-family:"OkulHarf","Fredoka","Arial Rounded MT Bold",sans-serif;font-weight:700;color:#3b2a5a;
-    font-size:clamp(84px,22vmin,220px);line-height:1;letter-spacing:.04em;
+    font-size:clamp(72px,19vmin,190px);line-height:1;letter-spacing:.04em;
     background:#fff;border-radius:34px;padding:.1em .35em .14em;border:6px solid #ffd166;
     box-shadow:0 20px 50px rgba(60,30,90,.35),0 0 0 8px rgba(255,255,255,.6);opacity:0;transform:scale(.2);
     pointer-events:none}
@@ -83,7 +83,7 @@
   #hece.fly{animation:fly .55s ease-in forwards}
   @keyframes pop{0%{opacity:0;transform:translateY(34vh) scale(.15) rotate(-12deg)}60%{opacity:1;transform:translateY(-4vh) scale(1.08) rotate(3deg)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
   @keyframes fly{0%{opacity:1;transform:translateY(0) scale(1) rotate(0)}100%{opacity:0;transform:translate(60vw,-30vh) scale(.6) rotate(25deg)}}
-  #clownWrap{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:56%;max-height:620px;width:auto;aspect-ratio:360/440;cursor:pointer}
+  #clownWrap{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:57%;max-height:640px;width:auto;aspect-ratio:360/520;cursor:pointer}
   #clown{width:100%;height:100%;display:block;animation:bob 2.6s ease-in-out infinite;transform-origin:50% 100%}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
   #wand{transform-origin:76px 160px}
@@ -96,7 +96,7 @@
   #mainBtn{position:absolute;right:16px;bottom:16px;z-index:6;font-size:clamp(18px,3.4vw,28px);padding:14px 26px}
   #hint{position:absolute;left:16px;bottom:16px;z-index:4;background:rgba(255,255,255,.85);border-radius:999px;
     padding:8px 16px;font-weight:700;color:#5a2d91;font-size:clamp(13px,2.2vw,17px);white-space:nowrap;pointer-events:none}
-  @media (max-width:600px){#hint{display:none} #mainBtn{right:50%;transform:translateX(50%);bottom:12px;white-space:nowrap} #clownWrap{height:44%} #cardArea{top:14%;height:36%}}
+  @media (max-width:600px){#hint{display:none} #mainBtn{right:50%;transform:translateX(50%);bottom:12px;white-space:nowrap} #clownWrap{height:46%} #cardArea{top:10%;height:34%}}
   #confetti{position:fixed;inset:0;z-index:30;pointer-events:none}
   .biglet{font-family:"OkulHarf","Fredoka",sans-serif;font-size:clamp(28px,6vw,52px);line-height:1.3;font-weight:700;margin:6px 0;color:#ff6b35;text-shadow:0 4px 0 #c74d1f}
 </style>
@@ -149,7 +149,7 @@
   <div id="stage">
     <div id="cardArea"><div id="hece">na</div></div>
     <div id="clownWrap" title="Şapkaya dokun!">
-      <svg id="clown" viewBox="0 0 360 440" xmlns="http://www.w3.org/2000/svg">
+      <svg id="clown" viewBox="0 -80 360 520" xmlns="http://www.w3.org/2000/svg">
         <!-- pelerin -->
         <path d="M58 440 L66 250 Q180 206 294 250 L302 440 Z" fill="#8b1e3f"/>
         <path d="M74 440 L80 262 Q180 226 280 262 L286 440 Z" fill="#c0392b" opacity=".55"/>
@@ -164,16 +164,22 @@
         <rect x="164" y="226" width="32" height="44" rx="12" fill="#f6c9a0"/>
         <circle cx="122" cy="178" r="11" fill="#f6c9a0"/><circle cx="238" cy="178" r="11" fill="#f6c9a0"/>
         <ellipse cx="180" cy="176" rx="60" ry="64" fill="#ffdcb8"/>
-        <!-- saç -->
-        <path d="M120 160 Q118 112 180 108 Q242 112 240 160 Q236 136 200 134 Q186 144 170 134 Q130 134 120 160 Z" fill="#2b1d3a"/>
-        <!-- silindir şapka (başta) -->
-        <path d="M136 112 L142 42 Q180 32 218 42 L224 112 Z" fill="#1c1c2e"/>
-        <rect x="139" y="92" width="82" height="13" fill="#ffd166"/>
-        <ellipse cx="180" cy="112" rx="66" ry="11" fill="#1c1c2e"/>
-        <path d="M178 58 L182 68 L193 69 L185 76 L187 87 L178 81 L169 87 L171 76 L163 69 L174 68 Z" fill="#ffd166"/>
-        <!-- kaşlar -->
-        <path d="M146 150 Q160 142 174 150" stroke="#2b1d3a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-        <path d="M186 150 Q200 142 214 150" stroke="#2b1d3a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <!-- palyaço saçı (turuncu bukleler) -->
+        <g fill="#ff6b35">
+          <circle cx="116" cy="140" r="18"/><circle cx="104" cy="166" r="17"/><circle cx="112" cy="194" r="16"/>
+          <circle cx="244" cy="140" r="18"/><circle cx="256" cy="166" r="17"/><circle cx="248" cy="194" r="16"/>
+        </g>
+        <!-- uzun siyah silindir şapka -->
+        <path d="M134 118 L140 -60 Q180 -70 220 -60 L226 118 Z" fill="#111118"/>
+        <path d="M140 -60 Q180 -70 220 -60 Q180 -50 140 -60 Z" fill="#2a2a3a"/>
+        <rect x="137" y="92" width="86" height="16" fill="#e63946"/>
+        <ellipse cx="180" cy="118" rx="74" ry="12" fill="#111118"/>
+        <ellipse cx="180" cy="116" rx="60" ry="7" fill="#2a2a3a"/>
+        <!-- göz boyası (mavi) -->
+        <path d="M160 142 L146 126 L162 136 L160 120 L170 136 L182 130 L172 146 Z" fill="#2b9bd6"/>
+        <path d="M200 142 L186 126 L202 136 L200 120 L210 136 L222 130 L212 146 Z" fill="#2b9bd6"/>
+        <path d="M144 190 Q160 200 176 190" stroke="#2b9bd6" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M184 190 Q200 200 216 190" stroke="#2b9bd6" stroke-width="4" fill="none" stroke-linecap="round"/>
         <!-- gözler -->
         <g class="blink" style="transform-origin:180px 172px">
           <ellipse cx="160" cy="172" rx="13" ry="14" fill="#fff"/><ellipse cx="200" cy="172" rx="13" ry="14" fill="#fff"/>
@@ -181,11 +187,11 @@
           <circle cx="162" cy="174" r="3.5" fill="#111"/><circle cx="202" cy="174" r="3.5" fill="#111"/>
           <circle cx="165" cy="170" r="2.5" fill="#fff"/><circle cx="205" cy="170" r="2.5" fill="#fff"/>
         </g>
-        <!-- yanaklar, burun, gülümseme -->
-        <circle cx="142" cy="200" r="10" fill="#ff9fb0" opacity=".6"/><circle cx="218" cy="200" r="10" fill="#ff9fb0" opacity=".6"/>
-        <path d="M180 184 Q174 198 182 200" stroke="#e0a97e" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <path d="M156 212 Q180 236 204 212" stroke="#c0392b" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <path d="M162 214 Q180 226 198 214 Z" fill="#fff"/>
+        <!-- yanaklar, büyük gülümseme, kırmızı burun -->
+        <circle cx="138" cy="206" r="12" fill="#ff8fab" opacity=".75"/><circle cx="222" cy="206" r="12" fill="#ff8fab" opacity=".75"/>
+        <path d="M138 212 Q180 262 222 212 Q180 232 138 212 Z" fill="#fff"/>
+        <path d="M144 218 Q180 254 216 218 Q180 240 144 218 Z" fill="#e63946"/>
+        <circle cx="180" cy="196" r="15" fill="#ff3b3b"/><circle cx="175" cy="191" r="4.5" fill="#fff" opacity=".7"/>
         <!-- kollar: sol el asayı kaldırmış -->
         <path d="M116 272 Q70 232 76 168" stroke="#1c1c2e" stroke-width="26" fill="none" stroke-linecap="round"/>
         <circle cx="76" cy="160" r="15" fill="#fff"/>
@@ -342,7 +348,7 @@ $('homeBtn').addEventListener('click', ()=>{ game.classList.remove('on'); intro.
 
 /* ---------- pırıltı ve konfeti ---------- */
 function sparkle(){
-  const r=clownWrap.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height*0.71;
+  const r=clownWrap.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height*0.755;
   const cols=['#ffd166','#ff5d8f','#2bc0a0','#2b9bd6','#fff','#ff6b35'];
   for(let i=0;i<18;i++){ const s=document.createElement('div'); s.className='spark'; s.style.left=cx+'px'; s.style.top=cy+'px'; s.style.background=pick(cols);
     const a=rnd(-Math.PI,0), d=rnd(60,180); s.style.setProperty('--dx',Math.cos(a)*d+'px'); s.style.setProperty('--dy',Math.sin(a)*d+'px');
