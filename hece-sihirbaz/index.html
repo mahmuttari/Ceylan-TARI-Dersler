@@ -58,6 +58,9 @@
   .btn.alt{background:linear-gradient(180deg,#4fd1c5,#1fa2b8);box-shadow:0 8px 0 #137488,0 14px 30px rgba(0,0,0,.25)}
   .btn.alt:active{box-shadow:0 2px 0 #137488,0 6px 14px rgba(0,0,0,.25)}
   .warn{color:#c0392b;font-weight:700;margin-top:10px;min-height:1.2em;font-size:clamp(14px,2.2vw,17px)}
+  #heceList{font-family:"OkulHarf","Fredoka",sans-serif;font-size:clamp(20px,3.4vw,28px);font-weight:700;color:#5a2d91;width:100%;
+    border:3px solid #d9cdf0;border-radius:16px;padding:8px 14px;background:#f4f0fb;resize:vertical;text-align:center;line-height:1.4}
+  #heceList:focus{outline:none;border-color:#ff9f1c}
 
   /* ---------- oyun ---------- */
   #game{position:fixed;inset:0;z-index:2;display:none}
@@ -80,10 +83,10 @@
   #hece.fly{animation:fly .55s ease-in forwards}
   @keyframes pop{0%{opacity:0;transform:translateY(34vh) scale(.15) rotate(-12deg)}60%{opacity:1;transform:translateY(-4vh) scale(1.08) rotate(3deg)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
   @keyframes fly{0%{opacity:1;transform:translateY(0) scale(1) rotate(0)}100%{opacity:0;transform:translate(60vw,-30vh) scale(.6) rotate(25deg)}}
-  #clownWrap{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:54%;max-height:600px;width:auto;aspect-ratio:360/420;cursor:pointer}
+  #clownWrap{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:56%;max-height:620px;width:auto;aspect-ratio:360/440;cursor:pointer}
   #clown{width:100%;height:100%;display:block;animation:bob 2.6s ease-in-out infinite;transform-origin:50% 100%}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-  #wand{transform-origin:80px 165px}
+  #wand{transform-origin:76px 160px}
   #clownWrap.open #wand{animation:wave .7s ease-in-out}
   @keyframes wave{0%,100%{transform:rotate(0)}30%{transform:rotate(-40deg)}65%{transform:rotate(25deg)}}
   .blink{animation:blink 4s infinite}
@@ -95,7 +98,7 @@
     padding:8px 16px;font-weight:700;color:#5a2d91;font-size:clamp(13px,2.2vw,17px);white-space:nowrap;pointer-events:none}
   @media (max-width:600px){#hint{display:none} #mainBtn{right:50%;transform:translateX(50%);bottom:12px;white-space:nowrap} #clownWrap{height:44%} #cardArea{top:14%;height:36%}}
   #confetti{position:fixed;inset:0;z-index:30;pointer-events:none}
-  .biglet{font-family:"OkulHarf","Fredoka",sans-serif;font-size:clamp(60px,14vw,120px);line-height:1;font-weight:700;margin:6px 0;color:#ff6b35;text-shadow:0 6px 0 #c74d1f}
+  .biglet{font-family:"OkulHarf","Fredoka",sans-serif;font-size:clamp(28px,6vw,52px);line-height:1.3;font-weight:700;margin:6px 0;color:#ff6b35;text-shadow:0 4px 0 #c74d1f}
 </style>
 </head>
 <body>
@@ -111,8 +114,11 @@
     <div class="lbl">Öğrendiğimiz harfler (dokunarak seç):</div>
     <div class="chips" id="vowels"></div>
     <div class="chips" id="consonants"></div>
+    <div class="lbl">Şapkadan çıkacak heceler (otomatik türetilir, istersen düzenle):</div>
+    <textarea id="heceList" rows="2">An, Na, Ana, Nana, Anan</textarea>
     <div class="opts">
-      <label><input type="checkbox" id="optWords" checked> Kelimeler de çıksın</label>
+      <label><input type="checkbox" id="optLower" checked> Küçük harfli halleri de çıksın (an, na…)</label>
+      <label><input type="checkbox" id="optLetters" checked> Harfler de tek tek çıksın (A, a, N, n)</label>
       <label><input type="checkbox" id="optNums" checked> 1 ve 2 sayıları da çıksın</label>
       <span>Hece sayısı:</span>
       <span class="seg" id="countSeg"><button data-n="10">10</button><button data-n="20" class="on">20</button><button data-n="30">30</button></span>
@@ -143,50 +149,61 @@
   <div id="stage">
     <div id="cardArea"><div id="hece">na</div></div>
     <div id="clownWrap" title="Şapkaya dokun!">
-      <svg id="clown" viewBox="0 0 360 420" xmlns="http://www.w3.org/2000/svg">
+      <svg id="clown" viewBox="0 0 360 440" xmlns="http://www.w3.org/2000/svg">
         <!-- pelerin -->
-        <path d="M70 420 L62 250 Q180 196 298 250 L290 420 Z" fill="#7a1f3d"/>
-        <path d="M100 420 L96 262 Q180 226 264 262 L260 420 Z" fill="#a52a5a" opacity=".5"/>
+        <path d="M58 440 L66 250 Q180 206 294 250 L302 440 Z" fill="#8b1e3f"/>
+        <path d="M74 440 L80 262 Q180 226 280 262 L286 440 Z" fill="#c0392b" opacity=".55"/>
         <!-- smokin -->
-        <path d="M95 420 L102 258 Q180 232 258 258 L265 420 Z" fill="#1b1b2b"/>
-        <path d="M152 258 L180 420 L208 258 Q180 248 152 258 Z" fill="#fff"/>
-        <path d="M152 258 L124 332 L172 296 Z" fill="#30304a"/><path d="M208 258 L236 332 L188 296 Z" fill="#30304a"/>
-        <circle cx="180" cy="306" r="4" fill="#1b1b2b"/><circle cx="180" cy="330" r="4" fill="#1b1b2b"/>
+        <path d="M98 440 L104 262 Q180 236 256 262 L262 440 Z" fill="#1c1c2e"/>
+        <path d="M150 262 L180 440 L210 262 Q180 252 150 262 Z" fill="#fff"/>
+        <path d="M150 262 L118 340 L170 300 Z" fill="#33334d"/><path d="M210 262 L242 340 L190 300 Z" fill="#33334d"/>
+        <circle cx="180" cy="318" r="4.5" fill="#1c1c2e"/><circle cx="180" cy="344" r="4.5" fill="#1c1c2e"/>
         <!-- papyon -->
-        <path d="M180 266 L156 254 L156 278 Z" fill="#e63946"/><path d="M180 266 L204 254 L204 278 Z" fill="#e63946"/><circle cx="180" cy="266" r="6" fill="#ffd166"/>
-        <!-- boyun ve kafa -->
-        <rect x="165" y="222" width="30" height="42" rx="10" fill="#ffd9b8"/>
-        <circle cx="124" cy="182" r="10" fill="#ffd9b8"/><circle cx="236" cy="182" r="10" fill="#ffd9b8"/>
-        <ellipse cx="180" cy="178" rx="58" ry="66" fill="#ffe3c6"/>
-        <path d="M122 168 Q124 106 180 104 Q236 106 238 168 Q226 134 180 134 Q134 134 122 168 Z" fill="#2a1b3d"/>
-        <circle cx="146" cy="206" r="11" fill="#ff8fab" opacity=".55"/><circle cx="214" cy="206" r="11" fill="#ff8fab" opacity=".55"/>
-        <path d="M148 158 Q162 148 176 158" stroke="#2a1b3d" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <path d="M184 158 Q198 148 212 158" stroke="#2a1b3d" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <g class="blink" style="transform-origin:180px 176px">
-          <ellipse cx="162" cy="176" rx="10" ry="11" fill="#fff"/><ellipse cx="198" cy="176" rx="10" ry="11" fill="#fff"/>
-          <circle cx="164" cy="178" r="5.5" fill="#2a1b3d"/><circle cx="200" cy="178" r="5.5" fill="#2a1b3d"/>
-          <circle cx="166" cy="175" r="2" fill="#fff"/><circle cx="202" cy="175" r="2" fill="#fff"/>
+        <path d="M180 270 L154 257 L154 283 Z" fill="#e63946"/><path d="M180 270 L206 257 L206 283 Z" fill="#e63946"/><circle cx="180" cy="270" r="6.5" fill="#ffd166"/>
+        <!-- boyun, kulaklar, yüz -->
+        <rect x="164" y="226" width="32" height="44" rx="12" fill="#f6c9a0"/>
+        <circle cx="122" cy="178" r="11" fill="#f6c9a0"/><circle cx="238" cy="178" r="11" fill="#f6c9a0"/>
+        <ellipse cx="180" cy="176" rx="60" ry="64" fill="#ffdcb8"/>
+        <!-- saç -->
+        <path d="M120 160 Q118 112 180 108 Q242 112 240 160 Q236 136 200 134 Q186 144 170 134 Q130 134 120 160 Z" fill="#2b1d3a"/>
+        <!-- silindir şapka (başta) -->
+        <path d="M136 112 L142 42 Q180 32 218 42 L224 112 Z" fill="#1c1c2e"/>
+        <rect x="139" y="92" width="82" height="13" fill="#ffd166"/>
+        <ellipse cx="180" cy="112" rx="66" ry="11" fill="#1c1c2e"/>
+        <path d="M178 58 L182 68 L193 69 L185 76 L187 87 L178 81 L169 87 L171 76 L163 69 L174 68 Z" fill="#ffd166"/>
+        <!-- kaşlar -->
+        <path d="M146 150 Q160 142 174 150" stroke="#2b1d3a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <path d="M186 150 Q200 142 214 150" stroke="#2b1d3a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <!-- gözler -->
+        <g class="blink" style="transform-origin:180px 172px">
+          <ellipse cx="160" cy="172" rx="13" ry="14" fill="#fff"/><ellipse cx="200" cy="172" rx="13" ry="14" fill="#fff"/>
+          <circle cx="162" cy="174" r="7.5" fill="#2b4c7e"/><circle cx="202" cy="174" r="7.5" fill="#2b4c7e"/>
+          <circle cx="162" cy="174" r="3.5" fill="#111"/><circle cx="202" cy="174" r="3.5" fill="#111"/>
+          <circle cx="165" cy="170" r="2.5" fill="#fff"/><circle cx="205" cy="170" r="2.5" fill="#fff"/>
         </g>
-        <path d="M180 184 L174 200 L186 200 Z" fill="#f4c6a0"/>
-        <path d="M158 210 Q169 200 180 210 Q191 200 202 210 Q191 218 180 212 Q169 218 158 210 Z" fill="#2a1b3d"/>
-        <path d="M160 222 Q180 240 200 222" stroke="#c0392b" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <!-- kollar -->
-        <path d="M112 280 Q68 236 80 176" stroke="#1b1b2b" stroke-width="24" fill="none" stroke-linecap="round"/>
-        <circle cx="80" cy="168" r="13" fill="#ffd9b8"/>
-        <g id="wand"><rect x="76" y="92" width="8" height="82" rx="4" fill="#1b1b2b"/><rect x="76" y="92" width="8" height="18" rx="4" fill="#fff"/></g>
-        <path d="M248 280 Q300 310 282 368" stroke="#1b1b2b" stroke-width="24" fill="none" stroke-linecap="round"/>
-        <circle cx="278" cy="372" r="13" fill="#ffd9b8"/>
+        <!-- yanaklar, burun, gülümseme -->
+        <circle cx="142" cy="200" r="10" fill="#ff9fb0" opacity=".6"/><circle cx="218" cy="200" r="10" fill="#ff9fb0" opacity=".6"/>
+        <path d="M180 184 Q174 198 182 200" stroke="#e0a97e" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M156 212 Q180 236 204 212" stroke="#c0392b" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M162 214 Q180 226 198 214 Z" fill="#fff"/>
+        <!-- kollar: sol el asayı kaldırmış -->
+        <path d="M116 272 Q70 232 76 168" stroke="#1c1c2e" stroke-width="26" fill="none" stroke-linecap="round"/>
+        <circle cx="76" cy="160" r="15" fill="#fff"/>
+        <g id="wand"><rect x="72" y="84" width="9" height="84" rx="4.5" fill="#1c1c2e"/><rect x="72" y="84" width="9" height="20" rx="4.5" fill="#fff" stroke="#1c1c2e" stroke-width="1"/></g>
+        <!-- sağ el şapkanın kenarında -->
+        <path d="M244 272 Q298 304 286 362" stroke="#1c1c2e" stroke-width="26" fill="none" stroke-linecap="round"/>
+        <circle cx="284" cy="370" r="15" fill="#fff"/>
         <!-- masa -->
-        <rect x="28" y="384" width="304" height="36" fill="#5a2d91"/>
-        <path d="M28 420 L28 396 Q58 388 88 396 Q118 404 148 396 Q180 388 212 396 Q242 404 272 396 Q302 388 332 396 L332 420 Z" fill="#6d3fc7"/>
-        <rect x="18" y="368" width="324" height="22" rx="8" fill="#8e5ad6"/>
-        <!-- şapka (masanın üstünde, ağzı açık) -->
+        <rect x="26" y="388" width="308" height="52" fill="#5a2d91"/>
+        <path d="M26 440 L26 400 Q56 392 86 400 Q116 408 146 400 Q180 392 214 400 Q244 408 274 400 Q304 392 334 400 L334 440 Z" fill="#6d3fc7"/>
+        <rect x="14" y="372" width="332" height="22" rx="9" fill="#9b6ee0"/>
+        <!-- sihir şapkası (masada, ağzı açık) -->
         <g id="hat">
-          <path d="M126 378 L134 312 L226 312 L234 378 Z" fill="#2a1a4a" stroke="#fff" stroke-width="3"/>
-          <rect x="132" y="350" width="96" height="13" fill="#ffd166"/>
-          <ellipse cx="180" cy="312" rx="46" ry="10" fill="#0b0b14" stroke="#fff" stroke-width="3"/>
-          <ellipse cx="180" cy="312" rx="38" ry="6" fill="#4b2a85"/>
-          <ellipse cx="180" cy="378" rx="76" ry="13" fill="#2a1a4a" stroke="#fff" stroke-width="3"/>
+          <path d="M124 382 L132 312 L228 312 L236 382 Z" fill="#2a1a4a" stroke="#fff" stroke-width="3"/>
+          <rect x="130" y="352" width="100" height="13" fill="#ffd166"/>
+          <ellipse cx="180" cy="312" rx="48" ry="10" fill="#0b0b14" stroke="#fff" stroke-width="3"/>
+          <ellipse cx="180" cy="312" rx="40" ry="6" fill="#4b2a85"/>
+          <ellipse cx="180" cy="382" rx="78" ry="13" fill="#2a1a4a" stroke="#fff" stroke-width="3"/>
         </g>
       </svg>
     </div>
@@ -236,29 +253,41 @@ function applauseUnlock(){ try{ applause.muted=true; const p=applause.play(); if
 function applausePlay(){ if(!soundOn) return; try{ applause.muted=false; applause.currentTime=0; const p=applause.play(); if(p&&p.catch) p.catch(()=>{}); }catch(e){} }
 $('soundBtn').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); soundOn=!soundOn; $('soundBtn').textContent=soundOn?'🔊':'🔇'; if(master) master.gain.setTargetAtTime(soundOn?1:0, actx.currentTime, 0.05); try{ applause.muted=!soundOn; if(!soundOn) applause.pause(); }catch(e){} });
 
-/* ---------- harf seçimi ---------- */
+/* ---------- harf seçimi ve hece türetme ---------- */
 const selected = new Set(DEFAULT_ON);
 function buildChips(){
-  const mk=(list, host, cls)=>{ host.innerHTML=''; list.forEach(l=>{ const b=document.createElement('button'); b.className='chip '+cls+(selected.has(l)?' on':''); b.textContent=l+' '+upper(l); b.addEventListener('click',()=>{ selected.has(l)?selected.delete(l):selected.add(l); b.classList.toggle('on'); warnEl.textContent=''; }); host.appendChild(b); }); };
+  const mk=(list, host, cls)=>{ host.innerHTML=''; list.forEach(l=>{ const b=document.createElement('button'); b.className='chip '+cls+(selected.has(l)?' on':''); b.textContent=l+' '+upper(l);
+    b.addEventListener('click',()=>{ selected.has(l)?selected.delete(l):selected.add(l); b.classList.toggle('on'); warnEl.textContent=''; regenerate(); }); host.appendChild(b); }); };
   mk(VOWELS,$('vowels'),'v'); mk(CONSONANTS,$('consonants'),'c');
 }
+// Seçili harflerden: na, an gibi heceler; a+na (ana), an+an (anan), na+na (nana) gibi birleşimler; sözlükteki basit kelimeler
+function generate(){
+  const v=VOWELS.filter(x=>selected.has(x)), c=CONSONANTS.filter(x=>selected.has(x));
+  const out=[]; const seen=new Set(); const add=s=>{ if(!seen.has(s)){ seen.add(s); out.push(s); } };
+  const cv=[], vc=[];
+  for(const k of c) for(const a of v){ cv.push(k+a); vc.push(a+k); }
+  for(let i=0;i<cv.length;i++){ add(vc[i]); add(cv[i]); }                 // an, na
+  for(const a of v) for(const s of cv) add(a+s);                             // ana, ela
+  const base=[...vc,...cv];
+  let combos=0;
+  for(const s1 of base) for(const s2 of base){ if(s1[s1.length-1]===s2[0]) continue; if(++combos>400) break; add(s1+s2); }  // anan, nana, elle…
+  const ok=new Set([...v,...c]);
+  for(const w of new Set(WORDS)) if(w.length>2 && [...w].every(ch=>ok.has(ch))) add(w);
+  return out.map(upper);
+}
+function regenerate(){ $('heceList').value = generate().join(', '); }
 buildChips();
 let goal=20;
 $('countSeg').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ goal=+b.dataset.n; $('countSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); }));
-
-/* ---------- hece üretimi ---------- */
+function readList(){
+  return $('heceList').value.split(/[,\n;]+/).map(s=>s.trim()).filter(Boolean);
+}
 function buildPool(){
-  const v=VOWELS.filter(x=>selected.has(x)), c=CONSONANTS.filter(x=>selected.has(x));
-  const base=new Set();
-  for(const a of v) base.add(a);                                           // a
-  for(const k of c) for(const a of v){ base.add(k+a); base.add(a+k);        // na, an
-    for(const k2 of c) base.add(k+a+k2); }                                  // nan
-  if($('optWords').checked){ const ok=new Set([...v,...c]); for(const w of new Set(WORDS)) if([...w].every(ch=>ok.has(ch)) && w.length>2) base.add(w); }
-  // her hece küçük, baş harfi büyük ve tamamı büyük biçimiyle
-  const pool=[];
-  for(const s of base){ const cap=upper(s), all=s.toLocaleUpperCase('tr');
-    pool.push(s); if(cap!==s) pool.push(cap); if(all!==cap && all!==s) pool.push(all); }
-  return {pool, v, c};
+  const items=readList();
+  const pool=[]; const seen=new Set(); const add=s=>{ if(!seen.has(s)){ seen.add(s); pool.push(s); } };
+  for(const s of items){ add(s); if($('optLower').checked){ add(s.toLocaleLowerCase('tr')); } }
+  if($('optLetters').checked){ for(const l of [...VOWELS,...CONSONANTS]) if(selected.has(l)){ add(l.toLocaleUpperCase('tr')); add(l); } }
+  return {pool, items};
 }
 let queue=[], current=null, score=0, busy=false, lastWasNum=false;
 function nextItem(){
@@ -270,8 +299,9 @@ function nextItem(){
 
 /* ---------- oyun akışı ---------- */
 function startGame(){
-  const {pool,v,c}=buildPool();
-  if(v.length===0||c.length===0||pool.length===0){ warnEl.textContent='En az bir sesli (mavi) ve bir sessiz (sarı) harf seçmelisin.'; return; }
+  const {pool}=buildPool();
+  if(pool.length===0){ warnEl.textContent='En az bir hece yazmalısın.'; return; }
+  warnEl.textContent='';
   ensureAudio(); applauseUnlock();
   try{ applause.pause(); applause.currentTime=0; }catch(e){}
   score=0; scoreEl.textContent='0'; goalEl.textContent=goal; queue=[]; current=null; busy=false;
@@ -299,8 +329,7 @@ function readDone(){
   }, 600);
 }
 function endGame(){
-  const {v,c}=buildPool();
-  $('winLetters').textContent=[...c,...v].map(l=>l+' '+upper(l)).join('  ');
+  $('winLetters').textContent=readList().join('  ');
   game.classList.remove('on'); win.classList.remove('hidden');
   applausePlay(); setTimeout(winSound,300); confettiBurst();
 }
@@ -313,7 +342,7 @@ $('homeBtn').addEventListener('click', ()=>{ game.classList.remove('on'); intro.
 
 /* ---------- pırıltı ve konfeti ---------- */
 function sparkle(){
-  const r=clownWrap.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height*0.74;
+  const r=clownWrap.getBoundingClientRect(); const cx=r.left+r.width/2, cy=r.top+r.height*0.71;
   const cols=['#ffd166','#ff5d8f','#2bc0a0','#2b9bd6','#fff','#ff6b35'];
   for(let i=0;i<18;i++){ const s=document.createElement('div'); s.className='spark'; s.style.left=cx+'px'; s.style.top=cy+'px'; s.style.background=pick(cols);
     const a=rnd(-Math.PI,0), d=rnd(60,180); s.style.setProperty('--dx',Math.cos(a)*d+'px'); s.style.setProperty('--dy',Math.sin(a)*d+'px');

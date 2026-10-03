@@ -35,10 +35,11 @@ Smokinli sihirbazın masasındaki şapkadan heceler çıkar; öğrenciler heceyi
 ve yeni hece çıkar.
 
 - Giriş ekranında öğrenilen harfler seçilir (varsayılan: **a** ve **n**). Seçili
-  harflerden türetilebilen tüm heceler üretilir: a, an, na, nan; her biri küçük
-  (an), baş harfi büyük (An) ve tamamı büyük (AN) biçimiyle çıkar.
-- "Kelimeler de çıksın" (varsayılan açık) ile yalnızca seçili harflerden oluşan
-  basit kelimeler de karışır (a ve n ile: ana, Ana, ANA).
+  harflerden heceler (An, Na), sesli + hece birleşimleri (Ana) ve iki heceli
+  birleşimler (Anan, Nana) ile sözlükteki basit kelimeler otomatik türetilip
+  listeye yazılır; öğretmen listeyi elle düzenleyebilir.
+- "Küçük harfli halleri de çıksın" ile her öğenin küçük harfli biçimi (an, na…)
+  de karışır; "Harfler de tek tek çıksın" ile A, a, N, n gibi tek harfler sorulur.
 - "1 ve 2 sayıları da çıksın" (varsayılan açık) ile arada mavi çerçeveli sayı
   kartları çıkar; sayının altında o kadar nokta vardır.
 - Hece sayısı 10 / 20 / 30 seçilebilir; hedefe ulaşınca konfeti ve alkış.
