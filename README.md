@@ -1,12 +1,16 @@
-# Ceylan Tarı – Dersler
+# Ceylan-TARI-Dersler
 
-Birinci sınıf öğrencileri için hazırlanan eğitici oyunlar ve ders materyalleri.
+1/C Sınıf Öğretmeni Ceylan Tarı'nın sınıf etkinlikleri.
 
-## Oyunlar
+## Dersler
 
-| Oyun | Konu | Dosya |
-|------|------|-------|
-| 🐠 N Harfi Akvaryumu | N / n harfini tanıma, büyük–küçük harf ayrımı | [`n-harfi-akvaryum/index.html`](n-harfi-akvaryum/index.html) |
+| Ders | Konu | Dosya |
+| --- | --- | --- |
+| 🔎 A Harfi Bulma Oyunu | A / a harfini bulma | [dersler/a-harfi-bulma-oyunu.html](dersler/a-harfi-bulma-oyunu.html) |
+| 🐠 N Harfi Akvaryumu | N / n harfini tanıma, büyük–küçük harf ayrımı | [n-harfi-akvaryum/index.html](n-harfi-akvaryum/index.html) |
+
+Her ders tek bir HTML dosyasıdır; yazı tipi ve sesler dosyanın içine gömülüdür, internet olmadan da çalışır.
+Ana sayfa (`index.html`) tüm dersleri listeler.
 
 ### N Harfi Akvaryumu
 
@@ -18,16 +22,14 @@ dokunup parmağını (veya fareyi) bırakmadan yukarı sürükleyerek balığı 
 - Doğru balık yakalanınca su sıçrama ve baloncuk sesi gelir, yıldız kazanılır.
 - Yanlış harfli balık (M, m, U, u, H, h, V, Z) yakalanırsa uyarı verilir ve balık suya geri düşer.
 - 10 yıldız toplanınca "Tebrikler" ekranı ve N ile başlayan kelimeler gösterilir.
-- Sesler tarayıcı içinde üretilir; ek dosya gerekmez. Sağ alttaki 🔊 düğmesi ile kapatılabilir.
+- Sesler tarayıcı içinde üretilir; sağ alttaki 🔊 düğmesi ile kapatılabilir.
 - Tarayıcıda Türkçe ses varsa hedef harf sesli olarak da söylenir.
-
-Oyun tek bir HTML dosyasıdır; `index.html` dosyasını herhangi bir tarayıcıda açmak yeterlidir.
-Tablet ve telefonda dokunmatik ekranla da çalışır.
 
 ## Yayın
 
-Depo GitHub Pages ile yayınlanır (`.github/workflows/pages.yml`, `main` dalına her
-gönderimde çalışır):
+Site GitHub Pages ile `gh-pages` dalından yayınlanır. `main` dalına her gönderimde
+`.github/workflows/pages.yml` iş akışı `main` içeriğini `gh-pages` dalına kopyalar.
 
 - Ana sayfa: https://mahmuttari.github.io/Ceylan-TARI-Dersler/
+- A Harfi Bulma Oyunu: https://mahmuttari.github.io/Ceylan-TARI-Dersler/dersler/a-harfi-bulma-oyunu.html
 - N Harfi Akvaryumu: https://mahmuttari.github.io/Ceylan-TARI-Dersler/n-harfi-akvaryum/
