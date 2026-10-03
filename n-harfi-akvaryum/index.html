@@ -121,8 +121,9 @@
    ========================================================= */
 const GOAL = 10;                       // kazanmak için gereken doğru yakalama
 const FISH_COUNT = 20;
-const SCARE_CHANCE = 0.4;              // kanca yaklaşınca balığın ürküp kaçma olasılığı
-const SLIP_CHANCE  = 0.15;             // takılan balığın yarı yolda kurtulma olasılığı
+const SCARE_CHANCE = 0.5;              // kanca yaklaşınca balığın ürküp kaçma olasılığı
+const SLIP_CHANCE  = 0.2;              // takılan balığın yarı yolda kurtulma olasılığı
+const BURST_RATE   = 0.10;             // balığın kendiliğinden ani hızlanma olasılığı (saniyede)
 const DISTRACTORS = ['M','m','U','u','H','h','V','Z'];
 const PALETTES = [
   ['#ff6b6b','#ffd166'], ['#ffa94d','#ff6b6b'], ['#ffd43b','#ff922b'],
@@ -521,6 +522,7 @@ function resolveCatch(){
     if(score >= GOAL){ setTimeout(endGame, 900); return; }
   }else{
     wrongSound();
+    if(score > 0){ score--; renderStars(); }     // yanlış balık: bir yıldız gider
     setTimeout(() => say('Yanlış! Bu ' + f.letter + ' harfi. N değil.'), 450);
     // balık suya geri düşer
     f.hooked = false; f.falling = true;
@@ -571,6 +573,12 @@ function update(dt){
       continue;
     }
     if(f.scareCd > 0) f.scareCd -= dt;
+    // ara sıra balık kendiliğinden ani bir hamle yapar
+    if(f.dash <= 0 && Math.random() < BURST_RATE*dt){
+      f.dash = rnd(0.4, 0.9);
+      f.vx = Math.sign(f.vx || 1) * rnd(180, 260) * S;
+      spawnBubbles(f.x - Math.sign(f.vx)*f.r, f.y, 2, f.r*0.4, false);
+    }
     if(f.dash > 0){
       f.dash -= dt;
       if(f.dash <= 0){ f.dash = 0; f.vx = Math.sign(f.vx) * rnd(35,75)*S; }
