@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | 🔎 A Harfi Bulma Oyunu | A / a harfini bulma | [dersler/a-harfi-bulma-oyunu.html](dersler/a-harfi-bulma-oyunu.html) |
 | 🐠 N Harfi Akvaryumu | N / n harfini tanıma, büyük–küçük harf ayrımı | [n-harfi-akvaryum/index.html](n-harfi-akvaryum/index.html) |
-| 🎪 Palyaçonun Şapkası | Öğrenilen harflerle hece okuma | [hece-palyaco/index.html](hece-palyaco/index.html) |
+| 🎩 Sihirbazın Şapkası | Öğrenilen harflerle hece okuma, 1 ve 2 sayıları | [hece-sihirbaz/index.html](hece-sihirbaz/index.html) |
 
 Her ders tek bir HTML dosyasıdır; yazı tipi ve sesler dosyanın içine gömülüdür, internet olmadan da çalışır.
 Ana sayfa (`index.html`) tüm dersleri listeler.
@@ -28,19 +28,22 @@ yoksa kanca su üstüne geri çıkar.
 - Hedef 15 büyük N ve 15 küçük n (toplam 30). Bir harf tamamlanınca yeni balıklar diğer harften gelir. İkisi de dolunca "Tebrikler" ekranı gösterilir ve alkış/tezahürat kaydı çalar.
 - Efekt sesleri tarayıcı içinde üretilir; final alkışı Wikimedia Commons'taki kamu malı "Clapping hurray.ogg" kaydıdır (yükleyen: starlite) ve dosyaya gömülüdür. Sağ alttaki 🔊 düğmesi tüm sesleri kapatır.
 
-### Palyaçonun Şapkası (Hece Okuma)
+### Sihirbazın Şapkası (Hece Okuma)
 
-Palyaçonun şapkasından heceler çıkar; öğrenciler heceyi okur, öğretmen "Okudum,
-Sıradaki" düğmesine (ya da şapkaya) dokunur, yıldız kazanılır ve yeni hece çıkar.
+Smokinli sihirbazın masasındaki şapkadan heceler çıkar; öğrenciler heceyi okur,
+öğretmen "Okudum, Sıradaki" düğmesine (ya da şapkaya) dokunur, yıldız kazanılır
+ve yeni hece çıkar.
 
-- Giriş ekranında öğrenilen harfler seçilir (varsayılan: **a** ve **n**). Heceler
-  seçili sessiz + sesli (na) ve sesli + sessiz (an) biçiminde üretilir; bazıları
-  büyük harfle başlar (Na, An).
-- "Kelimeler de çıksın" seçilirse yalnızca seçili harflerden oluşan basit
-  kelimeler de (ana, nane, elma…) karışır.
+- Giriş ekranında öğrenilen harfler seçilir (varsayılan: **a** ve **n**). Seçili
+  harflerden türetilebilen tüm heceler üretilir: a, an, na, nan; her biri küçük
+  (an), baş harfi büyük (An) ve tamamı büyük (AN) biçimiyle çıkar.
+- "Kelimeler de çıksın" (varsayılan açık) ile yalnızca seçili harflerden oluşan
+  basit kelimeler de karışır (a ve n ile: ana, Ana, ANA).
+- "1 ve 2 sayıları da çıksın" (varsayılan açık) ile arada mavi çerçeveli sayı
+  kartları çıkar; sayının altında o kadar nokta vardır.
 - Hece sayısı 10 / 20 / 30 seçilebilir; hedefe ulaşınca konfeti ve alkış.
 - Heceler A Harfi oyunundaki gömülü "OkulHarf" yazı tipiyle (dik temel harfler,
-  tek katlı "a") gösterilir. Palyaçonun burnuna dokununca korna çalar.
+  tek katlı "a") gösterilir.
 
 ## Yayın
 
@@ -50,4 +53,4 @@ Site GitHub Pages ile `gh-pages` dalından yayınlanır. `main` dalına her gön
 - Ana sayfa: https://mahmuttari.github.io/Ceylan-TARI-Dersler/
 - A Harfi Bulma Oyunu: https://mahmuttari.github.io/Ceylan-TARI-Dersler/dersler/a-harfi-bulma-oyunu.html
 - N Harfi Akvaryumu: https://mahmuttari.github.io/Ceylan-TARI-Dersler/n-harfi-akvaryum/
-- Palyaçonun Şapkası: https://mahmuttari.github.io/Ceylan-TARI-Dersler/hece-palyaco/
+- Sihirbazın Şapkası: https://mahmuttari.github.io/Ceylan-TARI-Dersler/hece-sihirbaz/
