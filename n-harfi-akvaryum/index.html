@@ -82,8 +82,8 @@
     <div class="biglet"><span>N</span> <span>n</span></div>
     <div class="fishrow">🐠🐟🐡🐠🐟</div>
     <p class="lead">Akvaryumdaki balıkların üzerinde harfler var.<br>
-      Oltanın ucunu <b>N ve n harfli</b> balığın üzerine götür,<br>
-      olta balığı kendiliğinden yukarı çeker!</p>
+      Oltayı tutup suya indir, kancayı <b>N ve n harfli</b> balığa değdir.<br>
+      Olta balığı kendiliğinden yukarı çeker!</p>
     <button class="btn" id="startBtn">🎣 Oyuna Başla</button>
   </div>
 </div>
@@ -106,7 +106,7 @@
 <canvas id="game"></canvas>
 
 <div id="hud" class="hidden">
-  <div class="pill">Yakala: <span class="tl" id="targetLetter">N</span><span id="targetName">Büyük N</span></div>
+  <div class="pill">Yakala: <span class="tl">N</span><span class="tl small">n</span></div>
   <div class="pill"><span>⭐</span><div class="stars" id="stars"></div></div>
 </div>
 <div id="msg"></div>
@@ -140,8 +140,6 @@ const winBox = document.getElementById('win');
 const hud = document.getElementById('hud');
 const msgEl = document.getElementById('msg');
 const soundBtn = document.getElementById('sound');
-const targetLetterEl = document.getElementById('targetLetter');
-const targetNameEl = document.getElementById('targetName');
 const starsEl = document.getElementById('stars');
 
 /* =========================================================
@@ -228,19 +226,24 @@ function catchSound(){
   });
 }
 
-// Yanlış balık: küçük sıçrama + düşen ton
+// Yanlış balık: küçük sıçrama + iki vuruşlu "yanlış" kornası
 function wrongSound(){
   if(!ensureAudio()) return;
-  splashSound(0, 0.25, 0.3);
-  const t = actx.currentTime;
-  const o = actx.createOscillator(); const g = actx.createGain();
-  o.type='triangle';
-  o.frequency.setValueAtTime(240,t);
-  o.frequency.exponentialRampToValueAtTime(150,t+0.35);
-  g.gain.setValueAtTime(0.0001,t);
-  g.gain.exponentialRampToValueAtTime(0.2,t+0.02);
-  g.gain.exponentialRampToValueAtTime(0.0001,t+0.4);
-  o.connect(g).connect(master); o.start(t); o.stop(t+0.45);
+  splashSound(0, 0.2, 0.25);
+  const t0 = actx.currentTime + 0.05;
+  [[t0, 220, 160], [t0+0.26, 180, 120]].forEach(([t, f1, f2]) => {
+    const o = actx.createOscillator(); const o2 = actx.createOscillator(); const g = actx.createGain();
+    const lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
+    o.type = 'sawtooth'; o2.type = 'square';
+    o.frequency.setValueAtTime(f1, t);  o.frequency.exponentialRampToValueAtTime(f2, t+0.22);
+    o2.frequency.setValueAtTime(f1*0.5, t); o2.frequency.exponentialRampToValueAtTime(f2*0.5, t+0.22);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.22, t+0.02);
+    g.gain.setValueAtTime(0.22, t+0.16);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+0.24);
+    o.connect(lp); o2.connect(lp); lp.connect(g).connect(master);
+    o.start(t); o2.start(t); o.stop(t+0.26); o2.stop(t+0.26);
+  });
 }
 
 // Boş suya tıklama: küçük "plop"
@@ -332,10 +335,11 @@ const rnd = (a,b) => a + Math.random()*(b-a);
 const pick = arr => arr[Math.floor(Math.random()*arr.length)];
 
 let fishes = [], bubbles = [], drops = [], plants = [], pebbles = [];
-let score = 0, target = 'N', running = false, time = 0, lastTs = 0;
+let score = 0, running = false, time = 0, lastTs = 0;
 const pointer = { x: W/2, y: H/2, inside:false };
-const hook = { x: 0, y: 0, state: 'free', fish: null };  // free | reeling | returning
+const hook = { x: 0, y: 0, state: 'free', fish: null, held: false };  // free | reeling | returning
 let catchCooldown = 0;   // yakalamadan sonra kısa bekleme (sn)
+const restY = () => waterTop - 26*S;   // olta tutulmazken kancanın beklediği yükseklik (su üstü)
 let msgTimer = 0;
 
 function fishRadius(){ return Math.max(26, 40*S); }
@@ -376,15 +380,6 @@ function buildPlants(){
   }
 }
 
-function setTarget(t, announce=true){
-  target = t;
-  const isBig = t === 'N';
-  targetLetterEl.textContent = t;
-  targetLetterEl.classList.toggle('small', !isBig);
-  targetNameEl.textContent = isBig ? 'Büyük N' : 'Küçük n';
-  if(announce) say(isBig ? 'Büyük N balıklarını yakala' : 'Küçük n balıklarını yakala');
-}
-
 function renderStars(){
   starsEl.innerHTML = '';
   for(let i=0;i<GOAL;i++){
@@ -402,7 +397,7 @@ function showMsg(text, kind, dur=1.6){
 
 function letterName(l){
   const upper = l === l.toUpperCase();
-  return (upper ? 'büyük ' : 'küçük ') + l;
+  return (upper ? 'Büyük ' : 'Küçük ') + l;
 }
 
 /* =========================================================
@@ -418,7 +413,8 @@ function startGame(){
   intro.classList.add('hidden'); winBox.classList.add('hidden');
   hud.classList.remove('hidden'); soundBtn.classList.remove('hidden');
   running = true;
-  setTarget(Math.random()<0.5?'N':'n');
+  hook.held = false; hook.y = restY(); catchCooldown = 0;
+  say('N harfli balıkları yakala!');
 }
 
 function endGame(){
@@ -444,19 +440,16 @@ canvas.addEventListener('pointerdown', e => {
   updatePointer(e);
   ensureAudio();
   try{ canvas.setPointerCapture(e.pointerId); }catch(err){}
-  if(hook.state !== 'free') return;
-  // dokunmatikte kanca anında parmağın altına gelsin
-  hook.x = pointer.x; hook.y = pointer.y;
-  if(!tryCatch() && hook.y > waterTop){
-    plopSound();
-    spawnBubbles(hook.x, hook.y, 3, 20*S);
-  }
+  hook.held = true;                 // olta tutuldu: kanca parmağa doğru iner
+  bubbleSound(0, 320, 0.12, 0.1);
 });
 function releasePointer(e){
   if(e && e.pointerId !== undefined){ try{ canvas.releasePointerCapture(e.pointerId); }catch(err){} }
+  hook.held = false;                // bırakıldı: kanca su üstüne geri çıkar
 }
 canvas.addEventListener('pointerup', releasePointer);
 canvas.addEventListener('pointercancel', releasePointer);
+window.addEventListener('blur', () => releasePointer(null));
 
 function tryCatch(){
   let best = null, bestD = Infinity;
@@ -481,23 +474,19 @@ function resolveCatch(){
   hook.fish = null; hook.state = 'returning';
   if(!f) return;
   spawnDrops(f.x, waterTop, 26);
-  if(f.letter === target){
+  if(f.letter === 'N' || f.letter === 'n'){
     score++; renderStars();
     catchSound();
-    showMsg('Aferin! ' + (target==='N' ? 'Büyük N' : 'Küçük n') + ' 🎉', 'good');
+    showMsg('Aferin! ' + letterName(f.letter) + ' 🎉', 'good');
     spawnBubbles(f.x, waterTop + 20, 18, 60*S);
     // balığı kaldır, aynı türden yeni balık getir
     fishes.splice(fishes.indexOf(f), 1);
     fishes.push(makeFish(f.letter, true));
     if(score >= GOAL){ setTimeout(endGame, 900); return; }
-    // hedefi değiştir (çoğunlukla diğer harfe geç)
-    const next = Math.random() < 0.65 ? (target==='N'?'n':'N') : target;
-    setTimeout(() => { if(running){ setTarget(next); } }, 1100);
   }else{
     wrongSound();
-    const isN = f.letter.toLowerCase() === 'n';
-    showMsg(isN ? ('Bu ' + letterName(f.letter) + '! ' + (target==='N'?'Büyük N':'Küçük n') + ' lazım')
-                : ('Bu ' + f.letter + ' harfi, N değil!'), 'bad');
+    showMsg('Yanlış! Bu ' + f.letter + ' harfi, N değil', 'bad');
+    setTimeout(() => say('Yanlış! Bu ' + f.letter + ' harfi. N değil.'), 450);
     // balık suya geri düşer
     f.hooked = false; f.falling = true;
     f.baseY = rnd(waterTop + f.r*1.6, sandTop - f.r*1.4);
@@ -565,11 +554,17 @@ function update(dt){
   // kanca
   if(catchCooldown > 0) catchCooldown -= dt;
   if(hook.state === 'free'){
-    const tx = pointer.x, ty = Math.max(waterTop - 40, pointer.y);
-    hook.x += (tx - hook.x) * Math.min(1, dt*12);
-    hook.y += (ty - hook.y) * Math.min(1, dt*12);
-    // kanca balığa değince balık kendiliğinden takılır
-    if(running && catchCooldown <= 0 && hook.y > waterTop) tryCatch();
+    if(hook.held){
+      // olta tutuluyor: kanca parmağın/farenin olduğu yere iner
+      const tx = pointer.x, ty = Math.max(restY(), pointer.y);
+      hook.x += (tx - hook.x) * Math.min(1, dt*10);
+      hook.y += (ty - hook.y) * Math.min(1, dt*10);
+      // kanca balığa değince balık takılır
+      if(running && catchCooldown <= 0 && hook.y > waterTop) tryCatch();
+    }else{
+      // tutulmuyor: kanca su üstünde bekler
+      hook.y += (restY() - hook.y) * Math.min(1, dt*6);
+    }
   }else if(hook.state === 'reeling'){
     // olta balığı kendisi yukarı çeker
     hook.y -= 420*S*dt;
@@ -577,13 +572,11 @@ function update(dt){
     if(hook.fish && Math.random() < 0.6) spawnBubbles(hook.x, hook.y + hook.fish.r, 2, hook.fish.r*0.6);
     if(hook.y <= waterTop + 6*S) resolveCatch();
   }else if(hook.state === 'returning'){
-    const ty = Math.max(waterTop - 40, pointer.y);
-    hook.x += (pointer.x - hook.x) * Math.min(1, dt*6);
-    hook.y += (ty - hook.y) * Math.min(1, dt*6);
-    if(Math.abs(ty - hook.y) < 12){ hook.state = 'free'; catchCooldown = 0.5; }
+    hook.y += (restY() - hook.y) * Math.min(1, dt*6);
+    if(Math.abs(restY() - hook.y) < 8){ hook.state = 'free'; catchCooldown = 0.5; }
   }
   hook.x = Math.max(10, Math.min(W-10, hook.x));
-  hook.y = Math.max(waterTop - 60, Math.min(H - 10, hook.y));
+  hook.y = Math.max(restY() - 10, Math.min(H - 10, hook.y));
 
   // baloncuklar
   for(let i=bubbles.length-1;i>=0;i--){
@@ -792,7 +785,7 @@ function drawRod(){
   ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.lineWidth = 1.5; ctx.stroke();
 
   // hedef halkası (serbestken)
-  if(hook.state === 'free' && hy > waterTop){
+  if(hook.state === 'free' && hook.held && hy > waterTop){
     ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 2; ctx.setLineDash([6,6]);
     ctx.beginPath(); ctx.arc(hx, hy, fishRadius()*1.1 + Math.sin(time*5)*3, 0, Math.PI*2); ctx.stroke();
     ctx.setLineDash([]);

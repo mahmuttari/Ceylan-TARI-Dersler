@@ -14,16 +14,17 @@ Ana sayfa (`index.html`) tüm dersleri listeler.
 
 ### N Harfi Akvaryumu
 
-Akvaryumda yüzen rengarenk balıkların üzerinde harfler vardır. Öğrenci oltanın
-ucunu (fare veya parmakla) balığın üzerine götürür; kanca balığa değince balık
-takılır ve olta onu kendiliğinden su yüzeyine çeker.
+Akvaryumda yüzen rengarenk balıkların üzerinde harfler vardır. Olta su üstünde
+bekler; öğrenci ekrana basılı tutarak (fare veya parmakla) kancayı suya indirir.
+Kanca balığa değince balık takılır ve olta onu kendiliğinden su yüzeyine çeker.
+Bırakınca kanca su üstüne geri çıkar.
 
-- Ekranın üstünde hangi harfin istendiği gösterilir: **Büyük N** veya **Küçük n**.
+- Hem **büyük N** hem **küçük n** balıkları doğrudur.
 - Doğru balık yakalanınca su sıçrama ve baloncuk sesi gelir, yıldız kazanılır.
-- Yanlış harfli balık (M, m, U, u, H, h, V, Z) yakalanırsa uyarı verilir ve balık suya geri düşer.
+- Yanlış harfli balık (M, m, U, u, H, h, V, Z) yakalanırsa "yanlış" sesi ve sesli uyarı verilir, balık suya geri düşer.
 - 10 yıldız toplanınca "Tebrikler" ekranı ve N ile başlayan kelimeler gösterilir.
 - Sesler tarayıcı içinde üretilir; sağ alttaki 🔊 düğmesi ile kapatılabilir.
-- Tarayıcıda Türkçe ses varsa hedef harf sesli olarak da söylenir.
+- Tarayıcıda Türkçe ses varsa yönergeler ve yanlış uyarısı sesli de söylenir.
 
 ## Yayın
 
