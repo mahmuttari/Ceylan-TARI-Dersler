@@ -14,9 +14,9 @@ Ana sayfa (`index.html`) tüm dersleri listeler.
 
 ### N Harfi Akvaryumu
 
-Akvaryumda yüzen rengarenk balıkların üzerinde harfler vardır. Öğrenci balığa
-dokunup parmağını (veya fareyi) bırakmadan yukarı sürükleyerek balığı suyun
-üstüne çıkarır. Yüzeye varmadan bırakırsa balık kurtulup kaçar.
+Akvaryumda yüzen rengarenk balıkların üzerinde harfler vardır. Öğrenci oltanın
+ucunu (fare veya parmakla) balığın üzerine götürür; kanca balığa değince balık
+takılır ve olta onu kendiliğinden su yüzeyine çeker.
 
 - Ekranın üstünde hangi harfin istendiği gösterilir: **Büyük N** veya **Küçük n**.
 - Doğru balık yakalanınca su sıçrama ve baloncuk sesi gelir, yıldız kazanılır.
